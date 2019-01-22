@@ -1,35 +1,34 @@
 package skalii.restful.onaftpostgraduatestudiesserver.controller.api
 
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.PUT
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Degree
-import skalii.restful.onaftpostgraduatestudiesserver.repository.ContactInfoRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.DegreesRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
-import skalii.restful.onaftpostgraduatestudiesserver.view.Json
+import skalii.restful.onaftpostgraduatestudiesserver.service.DegreesService
+import skalii.restful.onaftpostgraduatestudiesserver.view.Json.Companion.get
 
 
 @RequestMapping(
         value = ["/api/degrees"],
         produces = [APPLICATION_JSON_UTF8_VALUE])
 @RestController
-class DegreesRestController(
-        val contactInfoRepository: ContactInfoRepository,
-        val degreesRepository: DegreesRepository,
-        val usersRepository: UsersRepository
-) {
+class DegreesRestController {
+
+    @Autowired
+    private lateinit var degreesService: DegreesService
 
 
     /** ============================== GET requests ============================== */
@@ -40,12 +39,10 @@ class DegreesRestController(
             @PathVariable(value = "-view") view: String,
             @AuthenticationPrincipal authUser: UserDetails
     ) =
-            Json.get(
+            get(
                     view,
-                    degreesRepository.get(
-                            usersRepository.get(
-                                    authUser.username
-                            )
+                    degreesService.get(
+                            email = authUser.username
                     )
             )
 
@@ -53,54 +50,8 @@ class DegreesRestController(
     fun getOne(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
-                    value = "name",
-                    required = false) name: String?,
-            @RequestParam(
-                    value = "branch",
-                    required = false) branch: String?,
-            @RequestParam(
                     value = "id_degree",
-                    required = false) idDegree: Int?
-    ) =
-            Json.get(
-                    view,
-                    degreesRepository.get(
-                            name,
-                            branch,
-                            idDegree
-                    )
-            )
-
-    @GetMapping(value = ["one-by-user{-view}"])
-    fun getOneByUser(
-            @PathVariable(value = "-view") view: String,
-            @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
-            @RequestParam(
-                    value = "phone_number",
-                    required = false) phoneNumber: String?,
-            @RequestParam(
-                    value = "id_user",
-                    required = false) idUser: Int?
-    ) =
-            Json.get(
-                    view,
-                    degreesRepository.get(
-                            usersRepository.get(
-                                    email,
-                                    phoneNumber,
-                                    idUser
-                            )
-                    )
-            )
-
-    @GetMapping(value = ["all{-view}"])
-    fun getAll(
-            @PathVariable(value = "-view") view: String,
-            @RequestParam(
-                    value = "all_records",
-                    required = false) allRecords: Boolean?,
+                    required = false) idDegree: Int?,
             @RequestParam(
                     value = "name",
                     required = false) name: String?,
@@ -108,40 +59,44 @@ class DegreesRestController(
                     value = "branch",
                     required = false) branch: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    degreesRepository.getAll(
-                            allRecords,
+                    degreesService.get(
+                            idDegree,
                             name,
                             branch
                     )
             )
 
-
-    /** ============================== POST requests ============================== */
-
-
-    @PostMapping(value = ["one{-view}"])
-    fun add(
+    @GetMapping(value = ["one-by-user{-view}"])
+    fun getOneByUser(
             @PathVariable(value = "-view") view: String,
-            @RequestBody newDegree: Degree
+            @RequestParam(
+                    value = "id_user",
+                    required = false) idUser: Int?,
+            @RequestParam(
+                    value = "id_contact_info",
+                    required = false) idContactInfo: Int?,
+            @RequestParam(
+                    value = "phone_number",
+                    required = false) phoneNumber: String?,
+            @RequestParam(
+                    value = "email",
+                    required = false) email: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    degreesRepository.add(
-                            newDegree.name.value,
-                            newDegree.branch.value
+                    degreesService.get(
+                            idUser = idUser,
+                            idContactInfo = idContactInfo,
+                            phoneNumber = phoneNumber,
+                            email = email
                     )
             )
 
-
-    /** ============================== PUT requests ============================== */
-
-
-    @PutMapping(value = ["one{-view}"])
-    fun set(
+    @GetMapping(value = ["all{-view}"])
+    fun getAll(
             @PathVariable(value = "-view") view: String,
-            @RequestBody changedDegree: Degree,
             @RequestParam(
                     value = "name",
                     required = false) name: String?,
@@ -149,16 +104,43 @@ class DegreesRestController(
                     value = "branch",
                     required = false) branch: String?,
             @RequestParam(
-                    value = "id_degree",
-                    required = false) idDegree: Int?
+                    value = "all_records",
+                    required = false) allRecords: Boolean?
     ) =
-            Json.get(
+            get(
                     view,
-                    degreesRepository.set(
-                            changedDegree,
+                    degreesService.getAll(
                             name,
                             branch,
-                            idDegree
+                            allRecords
+                    )
+            )
+
+
+    /** ============================== POST/PUT requests ============================== */
+
+
+    @RequestMapping(
+            value = ["one{-view}"],
+            method = [POST, PUT])
+    fun add(
+            httpMethod: HttpMethod,
+            @PathVariable(value = "-view") view: String,
+            @RequestBody newDegree: Degree,
+            @RequestParam(
+                    value = "find_by_name",
+                    required = false) findByName: String?,
+            @RequestParam(
+                    value = "find_by_branch",
+                    required = false) findByBranch: String?
+    ) =
+            get(
+                    view,
+                    degreesService.save(
+                            httpMethod,
+                            newDegree,
+                            findByName,
+                            findByBranch
                     )
             )
 
@@ -170,21 +152,21 @@ class DegreesRestController(
     fun delete(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
+                    value = "id_degree",
+                    required = false) idDegree: Int?,
+            @RequestParam(
                     value = "name",
                     required = false) name: String?,
             @RequestParam(
                     value = "branch",
-                    required = false) branch: String?,
-            @RequestParam(
-                    value = "id_degree",
-                    required = false) idDegree: Int?
+                    required = false) branch: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    degreesRepository.delete(
+                    degreesService.delete(
+                            idDegree,
                             name,
-                            branch,
-                            idDegree
+                            branch
                     )
             )
 

@@ -21,7 +21,7 @@ class BranchesServiceImpl : BranchesService {
     @Autowired
     private lateinit var specialitiesRepository: SpecialitiesRepository
 
-    @Autowired
+    @Autowired //todo changed userRepository
     private lateinit var usersRepository: UsersRepository
 
     override fun get(

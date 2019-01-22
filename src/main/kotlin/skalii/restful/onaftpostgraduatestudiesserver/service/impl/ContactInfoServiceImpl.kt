@@ -11,7 +11,7 @@ import skalii.restful.onaftpostgraduatestudiesserver.service.ContactInfoService
 
 
 @Service
-class ContactInfoServiceImpl: ContactInfoService {
+class ContactInfoServiceImpl : ContactInfoService {
 
     @Autowired
     private lateinit var contactInfoRepository: ContactInfoRepository
@@ -61,13 +61,15 @@ class ContactInfoServiceImpl: ContactInfoService {
             phoneNumber: String?,
             email: String?
     ) =
-            contactInfoRepository.remove(
-                    contactInfoRepository.find(
-                            idContactInfo,
-                            idUser,
-                            phoneNumber,
-                            email
-                    )
-            )
+            contactInfoRepository.run {
+                remove(
+                        find(
+                                idContactInfo,
+                                idUser,
+                                phoneNumber,
+                                email
+                        )
+                )
+            }
 
 }
