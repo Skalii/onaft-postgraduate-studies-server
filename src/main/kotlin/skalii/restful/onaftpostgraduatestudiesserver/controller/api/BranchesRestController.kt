@@ -113,10 +113,11 @@ class BranchesRestController {
             )
 
     @GetMapping(value = ["all{-view}"])
-    fun getAll(@PathVariable(value = "-view") view: String) = get(
-            view,
-            branchesService.getAll()
-    )
+    fun getAll(@PathVariable(value = "-view") view: String) =
+            get(
+                    view,
+                    branchesService.getAll()
+            )
 
 
     /** ============================== POST/PUT requests ============================== */
@@ -124,8 +125,7 @@ class BranchesRestController {
 
     @RequestMapping(
             value = ["one{-view}"],
-            method = [POST, PUT]
-    )
+            method = [POST, PUT])
     fun save(
             httpMethod: HttpMethod,
             @PathVariable(value = "-view") view: String,

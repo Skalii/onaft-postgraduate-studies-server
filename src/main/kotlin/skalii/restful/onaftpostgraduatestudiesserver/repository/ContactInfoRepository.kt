@@ -1,16 +1,16 @@
 package skalii.restful.onaftpostgraduatestudiesserver.repository
 
 
-import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import org.springframework.data.repository.Repository as EmptyRepository
 import org.springframework.stereotype.Repository
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.ContactInfo
 
 
 @Repository
-interface ContactInfoRepository : JpaRepository<ContactInfo, Int> {
+interface ContactInfoRepository : EmptyRepository<ContactInfo, Int> {
 
 
     /** ============================== GET / SELECT ============================== */
@@ -24,17 +24,17 @@ interface ContactInfoRepository : JpaRepository<ContactInfo, Int> {
                           cast_text(:email)
                       )).*""",
             nativeQuery = true)
-    fun get(
-            @Param("email") email: String? = null,
-            @Param("phone_number") phoneNumber: String? = null,
+    fun find(
+            @Param("id_contact_info") idContactInfo: Int? = null,
             @Param("id_user") idUser: Int? = null,
-            @Param("id_contact_info") idContactInfo: Int? = null
+            @Param("phone_number") phoneNumber: String? = null,
+            @Param("email") email: String? = null
     ): ContactInfo
 
     //language=PostgresPLSQL
     @Query(value = "select (contact_info_record(all_records => true)).*",
             nativeQuery = true)
-    fun getAll(): MutableList<ContactInfo>
+    fun findAll(): MutableList<ContactInfo>
 
 
     /** ============================== ADD / INSERT INTO ============================== */
@@ -42,16 +42,12 @@ interface ContactInfoRepository : JpaRepository<ContactInfo, Int> {
 
     //language=PostgresPLSQL
     @Query(value = """select (contact_info_insert(
-                          cast_text(:phone_number),
-                          cast_text(:email),
-                          cast_text(:address)
+                          cast_text(:#{#contact_info.phoneNumber}),
+                          cast_text(:#{#contact_info.email}),
+                          cast_text(:#{#contact_info.address})
                       )).*""",
             nativeQuery = true)
-    fun add(
-            @Param("email") email: String,
-            @Param("phone_number") phoneNumber: String,
-            @Param("address") address: String?
-    ): ContactInfo
+    fun add(@Param("contact_info") newContactInfo: ContactInfo): ContactInfo
 
 
     /** ============================== SET / UPDATE ============================== */
@@ -62,18 +58,16 @@ interface ContactInfoRepository : JpaRepository<ContactInfo, Int> {
                           cast_text(:#{#contact_info.phoneNumber}),
                           cast_text(:#{#contact_info.email}),
                           cast_text(:#{#contact_info.address}),
-                          cast_int(:id_contact_info),
-                          cast_int(:id_user),
-                          cast_text(:phone_number),
-                          cast_text(:email)
+                          cast_int(:#{#contact_info.idContactInfo}),
+                          cast_int(:#{#contact_info.user.idUser}),
+                          cast_text(:old_phone_number),
+                          cast_text(:old_email)
                       )).*""",
             nativeQuery = true)
     fun set(
-            @Param("contact_info") changedContactInfo: ContactInfo,
-            @Param("email") email: String? = null,
-            @Param("phone_number") phoneNumber: String? = null,
-            @Param("id_user") idUser: Int? = null,
-            @Param("id_contact_info") idContactInfo: Int? = null
+            @Param("contact_info") newContactInfo: ContactInfo,
+            @Param("old_phone_number") findByPhoneNumber: String? = null,
+            @Param("old_email") findByEmail: String? = null
     ): ContactInfo
 
 
@@ -82,15 +76,11 @@ interface ContactInfoRepository : JpaRepository<ContactInfo, Int> {
 
     //language=PostgresPLSQL
     @Query(value = """select (contact_info_delete(
-                          cast_int(:id_contact_info),
-                          cast_text(:phone_number),
-                          cast_text(:email)
+                          cast_int(:#{#contact_info.idContactInfo}),
+                          cast_text(:#{#contact_info.phoneNumber}),
+                          cast_text(:#{#contact_info.email})
                       )).*""",
             nativeQuery = true)
-    fun delete(
-            @Param("email") email: String? = null,
-            @Param("phone_number") phoneNumber: String? = null,
-            @Param("id_contact_info") idContactInfo: Int? = null
-    ): ContactInfo
+    fun remove(@Param("contact_info") contactInfo: ContactInfo): ContactInfo
 
 }

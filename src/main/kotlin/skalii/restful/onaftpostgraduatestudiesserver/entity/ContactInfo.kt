@@ -19,7 +19,8 @@ import javax.persistence.Table
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
-import skalii.restful.onaftpostgraduatestudiesserver.view.View
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.REST
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.TREE
 
 
 @Entity(name = "ContactInfo")
@@ -54,7 +55,7 @@ data class ContactInfo(
                 generator = "contact_info_seq")
         @Id
         @get:JsonProperty(value = "id_contact_info")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         val idContactInfo: Int = 0,
 
@@ -62,7 +63,7 @@ data class ContactInfo(
                 nullable = false,
                 length = 100)
         @get:JsonProperty(value = "phone_number")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         @Size(max = 100)
         val phoneNumber: String = "",
@@ -71,7 +72,7 @@ data class ContactInfo(
                 nullable = false,
                 length = 150)
         @get:JsonProperty(value = "email")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         @Size(max = 150)
         val email: String = "",
@@ -79,7 +80,7 @@ data class ContactInfo(
         @Column(name = "address",
                 length = 200)
         @JsonProperty(value = "address")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @Size(max = 200)
         val address: String? = null
 
@@ -87,7 +88,7 @@ data class ContactInfo(
 
     @JsonIgnoreProperties(value = ["contact_info", "students", "sections"])
     @get:JsonProperty(value = "user")
-    @JsonView(View.TREE::class)
+    @JsonView(TREE::class)
     @OneToOne(
             targetEntity = User::class,
             fetch = LAZY,
