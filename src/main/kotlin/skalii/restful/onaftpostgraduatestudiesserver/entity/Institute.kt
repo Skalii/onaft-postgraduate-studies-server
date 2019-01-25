@@ -25,8 +25,7 @@ import skalii.restful.onaftpostgraduatestudiesserver.view.View.TREE
 
 @Entity(name = "Institute")
 @JsonPropertyOrder(
-        value = ["id_institute", "name", "named_after", "abbreviation", "departments"]
-)
+        value = ["id_institute", "name", "named_after", "abbreviation", "departments"])
 @SequenceGenerator(
         name = "institutes_seq",
         sequenceName = "institutes_id_institute_seq",
