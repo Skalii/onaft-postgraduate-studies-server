@@ -32,37 +32,39 @@ class BranchesServiceImpl : BranchesService {
             numberSpeciality: String?,
             nameSpeciality: String?,
             idUser: Int?,
-            idContactInfoUser: Int?,
-            emailUser: String?,
-            phoneNumberUser: String?
+            idContactInfo: Int?,
+            phoneNumberUser: String?,
+            emailUser: String?
     ) =
-            if (idBranch != null
-                    || number != null
-                    || name != null) {
-                branchesRepository.find(
-                        idBranch,
-                        number,
-                        name
-                )
-            } else if (idSpeciality != null
-                    || numberSpeciality != null
-                    || nameSpeciality != null) {
-                branchesRepository.findBySpeciality(
-                        specialitiesRepository.get(
-                                numberSpeciality,
-                                nameSpeciality,
-                                idSpeciality
-                        )
-                )
-            } else {
-                branchesRepository.findByUser(
-                        usersRepository.get(
-                                emailUser,
-                                phoneNumberUser,
-                                idUser,
-                                idContactInfoUser
-                        )
-                )
+            branchesRepository.run {
+                if (idBranch != null
+                        || number != null
+                        || name != null) {
+                    find(
+                            idBranch,
+                            number,
+                            name
+                    )
+                } else if (idSpeciality != null
+                        || numberSpeciality != null
+                        || nameSpeciality != null) {
+                    findBySpeciality(
+                            specialitiesRepository.get(
+                                    numberSpeciality,
+                                    nameSpeciality,
+                                    idSpeciality
+                            )
+                    )
+                } else {
+                    findByUser(
+                            usersRepository.get(
+                                    emailUser,
+                                    phoneNumberUser,
+                                    idUser,
+                                    idContactInfo
+                            )
+                    )
+                }
             }
 
     override fun getAll() = branchesRepository.findAll()

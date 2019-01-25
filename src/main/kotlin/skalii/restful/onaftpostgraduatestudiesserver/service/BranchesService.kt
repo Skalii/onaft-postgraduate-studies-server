@@ -16,9 +16,9 @@ interface BranchesService {
             numberSpeciality: String? = null,
             nameSpeciality: String? = null,
             idUser: Int? = null,
-            idContactInfoUser: Int? = null,
-            emailUser: String? = null,
-            phoneNumberUser: String? = null
+            idContactInfo: Int? = null,
+            phoneNumberUser: String? = null,
+            emailUser: String? = null
     ): Branch
 
     fun getAll(): MutableList<Branch>

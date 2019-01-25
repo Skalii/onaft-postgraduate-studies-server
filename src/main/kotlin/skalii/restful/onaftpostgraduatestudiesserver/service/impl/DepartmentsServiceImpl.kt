@@ -1,41 +1,36 @@
 package skalii.restful.onaftpostgraduatestudiesserver.service.impl
 
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
-
-import skalii.restful.onaftpostgraduatestudiesserver.entity.Degree
-import skalii.restful.onaftpostgraduatestudiesserver.repository.DegreesRepository
+import skalii.restful.onaftpostgraduatestudiesserver.entity.Department
+import skalii.restful.onaftpostgraduatestudiesserver.repository.DepartmentsRepository
 import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
-import skalii.restful.onaftpostgraduatestudiesserver.service.DegreesService
-
+import skalii.restful.onaftpostgraduatestudiesserver.service.DepartmentsService
 
 @Service
-class DegreesServiceImpl : DegreesService {
+class DepartmentsServiceImpl : DepartmentsService {
 
     @Autowired
-    private lateinit var degreesRepository: DegreesRepository
+    private lateinit var departmentsRepository: DepartmentsRepository
 
     @Autowired //todo changed userRepository
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
-            idDegree: Int?,
+            idDepartment: Int?,
             name: String?,
-            branch: String?,
             idUser: Int?,
             idContactInfo: Int?,
             phoneNumberUser: String?,
             emailUser: String?
     ) =
-            degreesRepository.run {
-                if (idDegree != null
-                        || ((name != null) && (branch != null))) {
+            departmentsRepository.run {
+                if (idDepartment != null
+                        && name != null) {
                     find(
-                            idDegree,
-                            name,
-                            branch
+                            idDepartment,
+                            name
                     )
                 } else {
                     findByUser(
@@ -50,42 +45,41 @@ class DegreesServiceImpl : DegreesService {
             }
 
     override fun getAll(
-            name: String?,
-            branch: String?,
+            idInstitute: Int?,
+            nameInstitute: String?,
+            idFaculty: Int?,
+            nameFaculty: String?,
             allRecords: Boolean?
     ) =
-            degreesRepository.run {
-
-                if (name == null
-                        && branch == null
-                        && allRecords == null) {
+            departmentsRepository.run {
+                if (idInstitute == null
+                        && nameInstitute == null
+                        && idFaculty == null
+                        && nameFaculty == null) {
                     findAll(allRecords = true)
                 } else {
                     findAll(
-                            name,
-                            branch,
+                            idInstitute, //todo ?: institutesService.get(name = nameInstitute).idInstitute
+                            idFaculty, //todo ?: facultiesService.get(name = nameFaculty).idFaculty
                             allRecords
                     )
                 }
-
             }
 
     override fun save(
             httpMethod: HttpMethod,
-            newDegree: Degree,
-            findByName: String?,
-            findByBranch: String?
+            newDepartment: Department,
+            findByName: String?
     ) =
-            degreesRepository.run {
+            departmentsRepository.run {
                 when {
                     httpMethod.matches("POST") -> {
-                        add(newDegree)
+                        add(newDepartment)
                     }
                     httpMethod.matches("PUT") -> {
                         set(
-                                newDegree,
-                                findByName,
-                                findByBranch
+                                newDepartment,
+                                findByName
                         )
                     }
                     else -> {
@@ -95,18 +89,16 @@ class DegreesServiceImpl : DegreesService {
             }
 
     override fun delete(
-            idDegree: Int?,
-            name: String?,
-            branch: String?
-    ) =
-            degreesRepository.run {
-                remove(
-                        find(
-                                idDegree,
-                                name,
-                                branch
-                        )
+            idDepartment: Int?,
+            name: String?
+    ) = departmentsRepository.run {
+        remove(
+                find(
+                        idDepartment,
+                        name
                 )
-            }
+        )
+
+    }
 
 }

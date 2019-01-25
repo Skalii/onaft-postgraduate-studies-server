@@ -42,7 +42,7 @@ class DegreesRestController {
             get(
                     view,
                     degreesService.get(
-                            email = authUser.username
+                            emailUser = authUser.username
                     )
             )
 
@@ -89,8 +89,8 @@ class DegreesRestController {
                     degreesService.get(
                             idUser = idUser,
                             idContactInfo = idContactInfo,
-                            phoneNumber = phoneNumber,
-                            email = email
+                            phoneNumberUser = phoneNumber,
+                            emailUser = email
                     )
             )
 

@@ -97,18 +97,22 @@ class BranchesRestController {
                     value = "id_user",
                     required = false) idUser: Int?,
             @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
+                    value = "id_contact_info",
+                    required = false) idContactInfo: Int?,
             @RequestParam(
                     value = "phone_number",
-                    required = false) phoneNumber: String?
+                    required = false) phoneNumber: String?,
+            @RequestParam(
+                    value = "email",
+                    required = false) email: String?
     ) =
             get(
                     view,
                     branchesService.get(
                             idUser = idUser,
-                            emailUser = email,
-                            phoneNumberUser = phoneNumber
+                            idContactInfo = idContactInfo,
+                            phoneNumberUser = phoneNumber,
+                            emailUser = email
                     )
             )
 

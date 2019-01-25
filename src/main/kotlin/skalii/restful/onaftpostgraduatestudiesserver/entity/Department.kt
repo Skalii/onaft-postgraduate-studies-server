@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonView
-import skalii.restful.onaftpostgraduatestudiesserver.repository.DepartmentsRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.FacultiesRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.InstitutesRepository
 
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -26,6 +23,9 @@ import javax.persistence.Table
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
+import skalii.restful.onaftpostgraduatestudiesserver.repository.DepartmentsRepository
+import skalii.restful.onaftpostgraduatestudiesserver.repository.FacultiesRepository
+import skalii.restful.onaftpostgraduatestudiesserver.repository.InstitutesRepository
 import skalii.restful.onaftpostgraduatestudiesserver.view.View.REST
 import skalii.restful.onaftpostgraduatestudiesserver.view.View.TREE
 
@@ -128,7 +128,7 @@ data class Department(
         this.faculty = faculty
     }
 
-
+/*
     fun fixInitializedAdd(
             institutesRepository: InstitutesRepository,
             facultiesRepository: FacultiesRepository
@@ -164,5 +164,6 @@ data class Department(
         )
         return this
     }
+*/
 
 }

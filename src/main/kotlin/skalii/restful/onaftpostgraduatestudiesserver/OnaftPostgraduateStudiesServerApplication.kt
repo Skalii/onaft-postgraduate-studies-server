@@ -11,3 +11,5 @@ class OnaftPostgraduateStudiesServerApplication
 fun main(args: Array<String>) {
 	runApplication<OnaftPostgraduateStudiesServerApplication>(*args)
 }
+
+//todo fixed all functions: fun(id.., name.., number.., ...) fun(id..) {id.. ?: ..Repository.findBy..(name.., number.., ...).id..}

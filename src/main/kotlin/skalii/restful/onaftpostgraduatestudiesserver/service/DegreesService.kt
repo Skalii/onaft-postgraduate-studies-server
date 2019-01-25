@@ -14,8 +14,8 @@ interface DegreesService {
             branch: String? = null,
             idUser: Int? = null,
             idContactInfo: Int? = null,
-            phoneNumber: String? = null,
-            email: String? = null
+            phoneNumberUser: String? = null,
+            emailUser: String? = null
     ): Degree
 
     fun getAll(
