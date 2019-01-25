@@ -17,7 +17,7 @@ class DegreesServiceImpl : DegreesService {
     @Autowired
     private lateinit var degreesRepository: DegreesRepository
 
-    @Autowired //todo changed userRepository
+    @Autowired //todo change userRepository
     private lateinit var usersRepository: UsersRepository
 
     override fun get(

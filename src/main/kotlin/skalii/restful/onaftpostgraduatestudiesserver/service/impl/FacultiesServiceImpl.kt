@@ -1,15 +1,22 @@
 package skalii.restful.onaftpostgraduatestudiesserver.service.impl
 
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
-import skalii.restful.onaftpostgraduatestudiesserver.entity.Department
+
+import skalii.restful.onaftpostgraduatestudiesserver.entity.Faculty
 import skalii.restful.onaftpostgraduatestudiesserver.repository.DepartmentsRepository
+import skalii.restful.onaftpostgraduatestudiesserver.repository.FacultiesRepository
 import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
-import skalii.restful.onaftpostgraduatestudiesserver.service.DepartmentsService
+import skalii.restful.onaftpostgraduatestudiesserver.service.FacultiesService
+
 
 @Service
-class DepartmentsServiceImpl : DepartmentsService {
+class FacultiesServiceImpl : FacultiesService {
+
+    @Autowired
+    private lateinit var facultiesRepository: FacultiesRepository
 
     @Autowired
     private lateinit var departmentsRepository: DepartmentsRepository
@@ -18,19 +25,29 @@ class DepartmentsServiceImpl : DepartmentsService {
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
-            idDepartment: Int?,
+            idFaculty: Int?,
             name: String?,
+            idDepartment: Int?,
+            nameDepartment: String?,
             idUser: Int?,
             idContactInfo: Int?,
             phoneNumberUser: String?,
             emailUser: String?
     ) =
-            departmentsRepository.run {
-                if (idDepartment != null
-                        && name != null) {
+            facultiesRepository.run {
+                if (idFaculty != null
+                        || name != null) {
                     find(
-                            idDepartment,
+                            idFaculty,
                             name
+                    )
+                } else if (idDepartment != null
+                        || nameDepartment != null) {
+                    findByDepartment(
+                            departmentsRepository.find(
+                                    idDepartment,
+                                    name
+                            )
                     )
                 } else {
                     findByUser(
@@ -47,20 +64,14 @@ class DepartmentsServiceImpl : DepartmentsService {
     override fun getAll(
             idInstitute: Int?,
             nameInstitute: String?,
-            idFaculty: Int?,
-            nameFaculty: String?,
             allRecords: Boolean?
     ) =
-            departmentsRepository.run {
-                if (idInstitute == null
-                        && nameInstitute == null
-                        && idFaculty == null
-                        && nameFaculty == null) {
+            facultiesRepository.run {
+                if (idInstitute == null) {
                     findAll(allRecords = true)
                 } else {
                     findAll(
                             idInstitute, //todo ?: institutesService.get(name = nameInstitute).idInstitute
-                            idFaculty, //todo ?: facultiesService.get(name = nameFaculty).idFaculty
                             allRecords
                     )
                 }
@@ -68,17 +79,17 @@ class DepartmentsServiceImpl : DepartmentsService {
 
     override fun save(
             httpMethod: HttpMethod,
-            newDepartment: Department,
+            newFaculty: Faculty,
             findByName: String?
     ) =
-            departmentsRepository.run {
+            facultiesRepository.run {
                 when {
                     httpMethod.matches("POST") -> {
-                        add(newDepartment)
+                        add(newFaculty)
                     }
                     httpMethod.matches("PUT") -> {
                         set(
-                                newDepartment,
+                                newFaculty,
                                 findByName
                         )
                     }
@@ -89,16 +100,16 @@ class DepartmentsServiceImpl : DepartmentsService {
             }
 
     override fun delete(
-            idDepartment: Int?,
+            idFaculty: Int?,
             name: String?
-    ) = departmentsRepository.run {
-        remove(
-                find(
-                        idDepartment,
-                        name
+    ) =
+            facultiesRepository.run {
+                remove(
+                        find(
+                                idFaculty,
+                                name
+                        )
                 )
-        )
-
-    }
+            }
 
 }
