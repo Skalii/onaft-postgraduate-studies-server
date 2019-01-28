@@ -1,37 +1,34 @@
 package skalii.restful.onaftpostgraduatestudiesserver.controller.api
 
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.PUT
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Institute
-import skalii.restful.onaftpostgraduatestudiesserver.repository.ContactInfoRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.DepartmentsRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.InstitutesRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
-import skalii.restful.onaftpostgraduatestudiesserver.view.Json
+import skalii.restful.onaftpostgraduatestudiesserver.service.InstitutesService
+import skalii.restful.onaftpostgraduatestudiesserver.view.Json.Companion.get
 
 
 @RequestMapping(
         value = ["/api/institutes"],
         produces = [APPLICATION_JSON_UTF8_VALUE])
 @RestController
-class InstitutesRestController(
-        val contactInfoRepository: ContactInfoRepository,
-        val departmentsRepository: DepartmentsRepository,
-        val institutesRepository: InstitutesRepository,
-        val usersRepository: UsersRepository
-) {
+class InstitutesRestController {
+
+    @Autowired
+    private lateinit var institutesService: InstitutesService
 
 
     /** ============================== GET requests ============================== */
@@ -42,12 +39,10 @@ class InstitutesRestController(
             @PathVariable(value = "-view") view: String,
             @AuthenticationPrincipal authUser: UserDetails
     ) =
-            Json.get(
+            get(
                     view,
-                    institutesRepository.get(
-                            usersRepository.get(
-                                    authUser.username
-                            )
+                    institutesService.get(
+                            emailUser = authUser.username
                     )
             )
 
@@ -55,17 +50,17 @@ class InstitutesRestController(
     fun getOne(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
-                    value = "name",
-                    required = false) name: String?,
-            @RequestParam(
                     value = "id_institute",
-                    required = false) idInstitute: Int?
+                    required = false) idInstitute: Int?,
+            @RequestParam(
+                    value = "name",
+                    required = false) name: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    institutesRepository.get(
-                            name,
-                            idInstitute
+                    institutesService.get(
+                            idInstitute,
+                            name
                     )
             )
 
@@ -73,19 +68,17 @@ class InstitutesRestController(
     fun getOneByDepartment(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
-                    value = "department_name",
-                    required = false) departmentName: String?,
-            @RequestParam(
                     value = "id_department",
-                    required = false) idDepartment: Int?
+                    required = false) idDepartment: Int?,
+            @RequestParam(
+                    value = "name_department",
+                    required = false) nameDepartment: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    institutesRepository.get(
-                            departmentsRepository.get(
-                                    departmentName,
-                                    idDepartment
-                            )
+                    institutesService.get(
+                            idDepartment = idDepartment,
+                            nameDepartment = nameDepartment
                     )
             )
 
@@ -93,72 +86,56 @@ class InstitutesRestController(
     fun getOneByUser(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
+                    value = "id_user",
+                    required = false) idUser: Int?,
+            @RequestParam(
+                    value = "id_contact_info",
+                    required = false) idContactInfo: Int?,
             @RequestParam(
                     value = "phone_number",
                     required = false) phoneNumber: String?,
             @RequestParam(
-                    value = "id_user",
-                    required = false) idUser: Int?
+                    value = "email",
+                    required = false) email: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    institutesRepository.get(
-                            usersRepository.get(
-                                    email,
-                                    phoneNumber,
-                                    idUser
-                            )
+                    institutesService.get(
+                            idUser = idUser,
+                            idContactInfo = idContactInfo,
+                            phoneNumberUser = phoneNumber,
+                            emailUser = email
                     )
             )
 
     @GetMapping(value = ["all{-view}"])
     fun getAll(@PathVariable(value = "-view") view: String) =
-            Json.get(
+            get(
                     view,
-                    institutesRepository.getAll()
+                    institutesService.getAll()
             )
 
 
-    /** ============================== POST requests ============================== */
+    /** ============================== POST/PUT requests ============================== */
 
 
-    @PostMapping(value = ["one{-view}"])
+    @RequestMapping(
+            value = ["one{-view}"],
+            method = [POST, PUT])
     fun add(
+            httpMethod: HttpMethod,
             @PathVariable(value = "-view") view: String,
-            @RequestBody newInstitute: Institute
-    ) =
-            Json.get(
-                    view,
-                    institutesRepository.add(
-                            newInstitute.name,
-                            newInstitute.namedAfter,
-                            newInstitute.abbreviation
-                    )
-            )
-
-
-    /** ============================== PUT requests ============================== */
-
-
-    @PutMapping(value = ["one{-view}"])
-    fun set(
-            @PathVariable(value = "-view") view: String,
-            @RequestBody changedInstitute: Institute,
+            @RequestBody newInstitute: Institute,
             @RequestParam(
                     value = "name",
-                    required = false) name: String?,
-            @RequestParam(
-                    value = "id_institute",
-                    required = false) idInstitute: Int?
+                    required = false) name: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    institutesRepository.set(
-                            changedInstitute,
-                            name,
-                            idInstitute
+                    institutesService.save(
+                            httpMethod,
+                            newInstitute,
+                            name
                     )
             )
 
@@ -170,17 +147,17 @@ class InstitutesRestController(
     fun delete(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
-                    value = "name",
-                    required = false) name: String?,
-            @RequestParam(
                     value = "id_institute",
-                    required = false) idInstitute: Int?
+                    required = false) idInstitute: Int?,
+            @RequestParam(
+                    value = "name",
+                    required = false) name: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    institutesRepository.delete(
-                            name,
-                            idInstitute
+                    institutesService.delete(
+                            idInstitute,
+                            name
                     )
             )
 
