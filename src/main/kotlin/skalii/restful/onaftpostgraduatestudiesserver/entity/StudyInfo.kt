@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonView
 import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.Entity
-import javax.persistence.FetchType.LAZY
+import javax.persistence.FetchType.EAGER
 import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
@@ -104,7 +104,7 @@ data class StudyInfo(
     @JsonView(View.STUDENT_TREE::class)
     @ManyToOne(
             targetEntity = User::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var instructor: User
 
@@ -113,7 +113,7 @@ data class StudyInfo(
     @JsonView(View.TREE::class, View.STUDENT_TREE::class, View.INSTRUCTOR_TREE::class)
     @OneToOne(
             targetEntity = User::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false,
             mappedBy = "studyInfo")
     var user: User? = null

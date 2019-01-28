@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView
 
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.LAZY
+import javax.persistence.FetchType.EAGER
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
@@ -27,8 +27,7 @@ import skalii.restful.onaftpostgraduatestudiesserver.view.View.TREE
 @JsonPropertyOrder(
         value = [
             "id_scientific_links", "orcid", "researcherid",
-            "google_scholar_id", "scopus_author_id", "user"
-        ])
+            "google_scholar_id", "scopus_author_id", "user"])
 @SequenceGenerator(
         name = "scientific_links_seq",
         sequenceName = "scientific_links_id_scientific_links_seq",
@@ -103,7 +102,7 @@ data class ScientificLinks(
     @JsonView(TREE::class)
     @OneToOne(
             targetEntity = User::class,
-            fetch = LAZY,
+            fetch = EAGER,
             mappedBy = "scientificLinks")
     lateinit var user: User
 

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView
 
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.LAZY
+import javax.persistence.FetchType.EAGER
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
@@ -91,7 +91,7 @@ data class ContactInfo(
     @JsonView(TREE::class)
     @OneToOne(
             targetEntity = User::class,
-            fetch = LAZY,
+            fetch = EAGER,
             mappedBy = "contactInfo")
     lateinit var user: User
 

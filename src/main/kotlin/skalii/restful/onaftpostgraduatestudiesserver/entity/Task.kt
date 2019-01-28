@@ -11,7 +11,7 @@ import java.util.Date
 
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.LAZY
+import javax.persistence.FetchType.EAGER
 import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
@@ -149,7 +149,7 @@ data class Task(
     @JsonView(TREE::class)
     @ManyToOne(
             targetEntity = Section::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var section: Section
 

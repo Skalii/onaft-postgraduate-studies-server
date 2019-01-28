@@ -10,7 +10,7 @@ import skalii.restful.onaftpostgraduatestudiesserver.service.BranchesService
 
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.LAZY
+import javax.persistence.FetchType.EAGER
 import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
@@ -94,7 +94,7 @@ data class Speciality(
     @JsonView(TREE::class)
     @ManyToOne(
             targetEntity = Branch::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var branch: Branch
 

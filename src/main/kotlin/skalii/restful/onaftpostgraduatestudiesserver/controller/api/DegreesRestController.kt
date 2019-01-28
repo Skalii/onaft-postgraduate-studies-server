@@ -123,7 +123,7 @@ class DegreesRestController {
     @RequestMapping(
             value = ["one{-view}"],
             method = [POST, PUT])
-    fun add(
+    fun saveOne(
             httpMethod: HttpMethod,
             @PathVariable(value = "-view") view: String,
             @RequestBody newDegree: Degree,
@@ -149,7 +149,7 @@ class DegreesRestController {
 
 
     @DeleteMapping(value = ["one{-view}"])
-    fun delete(
+    fun deleteOne(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
                     value = "id_degree",

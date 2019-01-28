@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView
 
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.LAZY
+import javax.persistence.FetchType.EAGER
 import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
@@ -97,7 +97,7 @@ data class Section(
     @JsonView(View.TREE::class)
     @ManyToOne(
             targetEntity = User::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var user: User
 

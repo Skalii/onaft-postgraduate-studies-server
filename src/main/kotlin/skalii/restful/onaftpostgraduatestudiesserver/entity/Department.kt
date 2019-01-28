@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView
 
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.LAZY
+import javax.persistence.FetchType.EAGER
 import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
@@ -83,7 +83,7 @@ data class Department(
     @JsonView(REST::class)
     @ManyToOne(
             targetEntity = Institute::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var institute: Institute
 
@@ -96,7 +96,7 @@ data class Department(
     @JsonView(REST::class)
     @ManyToOne(
             targetEntity = Faculty::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var faculty: Faculty
 

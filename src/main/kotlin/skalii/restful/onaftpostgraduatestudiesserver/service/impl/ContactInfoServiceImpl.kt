@@ -18,9 +18,9 @@ class ContactInfoServiceImpl : ContactInfoService {
 
     override fun get(
             idContactInfo: Int?,
-            idUser: Int?,
             phoneNumber: String?,
-            email: String?
+            email: String?,
+            idUser: Int?
     ) =
             contactInfoRepository.find(
                     idContactInfo,
@@ -35,7 +35,7 @@ class ContactInfoServiceImpl : ContactInfoService {
             httpMethod: HttpMethod,
             newContactInfo: ContactInfo,
             findByPhoneNumber: String?,
-            findByEmail: String?
+            findByEmailUser: String?
     ) =
             contactInfoRepository.run {
                 when {
@@ -46,7 +46,7 @@ class ContactInfoServiceImpl : ContactInfoService {
                         set(
                                 newContactInfo,
                                 findByPhoneNumber,
-                                findByEmail
+                                findByEmailUser
                         )
                     }
                     else -> {
@@ -57,9 +57,9 @@ class ContactInfoServiceImpl : ContactInfoService {
 
     override fun delete(
             idContactInfo: Int?,
-            idUser: Int?,
             phoneNumber: String?,
-            email: String?
+            email: String?,
+            idUser: Int?
     ) =
             contactInfoRepository.run {
                 remove(

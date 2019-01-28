@@ -52,22 +52,22 @@ class ContactInfoRestController {
                     value = "id_contact_info",
                     required = false) idContactInfo: Int?,
             @RequestParam(
-                    value = "id_user",
-                    required = false) idUser: Int?,
-            @RequestParam(
                     value = "phone_number",
                     required = false) phoneNumber: String?,
             @RequestParam(
                     value = "email",
-                    required = false) email: String?
+                    required = false) email: String?,
+            @RequestParam(
+                    value = "id_user",
+                    required = false) idUser: Int?
     ) =
             get(
                     view,
                     contactInfoService.get(
                             idContactInfo,
-                            idUser,
                             phoneNumber,
-                            email
+                            email,
+                            idUser
                     )
             )
 
@@ -82,10 +82,26 @@ class ContactInfoRestController {
     /** ============================== POST/PUT requests ============================== */
 
 
+    @PutMapping(value = ["my{-view}"])
+    fun saveMy(
+            httpMethod: HttpMethod,
+            @PathVariable(value = "-view") view: String,
+            @RequestBody newContactInfo: ContactInfo,
+            @AuthenticationPrincipal authUser: UserDetails
+    ) =
+            get(
+                    view,
+                    contactInfoService.save(
+                            httpMethod,
+                            newContactInfo,
+                            findByEmailUser = authUser.username
+                    )
+            )
+
     @RequestMapping(
             value = ["one{-view}"],
             method = [POST, PUT])
-    fun save(
+    fun saveOne(
             httpMethod: HttpMethod,
             @PathVariable(value = "-view") view: String,
             @RequestBody newContactInfo: ContactInfo,
@@ -106,49 +122,33 @@ class ContactInfoRestController {
                     )
             )
 
-    @PutMapping(value = ["my{-view}"])
-    fun saveMy(
-            httpMethod: HttpMethod,
-            @PathVariable(value = "-view") view: String,
-            @RequestBody newContactInfo: ContactInfo,
-            @AuthenticationPrincipal authUser: UserDetails
-    ) =
-            get(
-                    view,
-                    contactInfoService.save(
-                            httpMethod,
-                            newContactInfo,
-                            findByEmail = authUser.username
-                    )
-            )
-
 
     /** ============================== DELETE requests ============================== */
 
 
     @DeleteMapping(value = ["one{-view}"])
-    fun delete(
+    fun deleteOne(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
                     value = "id_contact_info",
                     required = false) idContactInfo: Int?,
             @RequestParam(
-                    value = "id_user",
-                    required = false) idUser: Int?,
-            @RequestParam(
                     value = "phone_number",
                     required = false) phoneNumber: String?,
             @RequestParam(
                     value = "email",
-                    required = false) email: String?
+                    required = false) email: String?,
+            @RequestParam(
+                    value = "id_user",
+                    required = false) idUser: Int?
     ) =
             get(
                     view,
                     contactInfoService.delete(
                             idContactInfo,
-                            idUser,
                             phoneNumber,
-                            email
+                            email,
+                            idUser
                     )
             )
 

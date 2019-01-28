@@ -8,7 +8,7 @@ import java.util.Date
 import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.Entity
-import javax.persistence.FetchType.LAZY
+import javax.persistence.FetchType.EAGER
 import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
@@ -161,7 +161,7 @@ data class User(
     @JsonView(REST::class)
     @ManyToOne(
             targetEntity = Degree::class,
-            fetch = LAZY)
+            fetch = EAGER)
     var degree: Degree? = null
 
     @JoinColumn(
@@ -173,7 +173,7 @@ data class User(
     @JsonView(REST::class)
     @ManyToOne(
             targetEntity = Speciality::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var speciality: Speciality
 
@@ -186,7 +186,7 @@ data class User(
     @JsonView(REST::class)
     @ManyToOne(
             targetEntity = Department::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var department: Department
 
@@ -199,7 +199,7 @@ data class User(
     @JsonView(REST::class)
     @OneToOne(
             targetEntity = ContactInfo::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var contactInfo: ContactInfo
 
@@ -212,7 +212,7 @@ data class User(
     @JsonView(REST::class)
     @OneToOne(
             targetEntity = ScientificLinks::class,
-            fetch = LAZY,
+            fetch = EAGER,
             optional = false)
     lateinit var scientificLinks: ScientificLinks
 
@@ -224,7 +224,7 @@ data class User(
     @JsonView(STUDENT::class)
     @OneToOne(
             targetEntity = StudyInfo::class,
-            fetch = LAZY)
+            fetch = EAGER)
     var studyInfo: StudyInfo? = null
 
     @JsonIgnoreProperties(value = ["instructor"])

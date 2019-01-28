@@ -130,7 +130,7 @@ class BranchesRestController {
     @RequestMapping(
             value = ["one{-view}"],
             method = [POST, PUT])
-    fun save(
+    fun saveOne(
             httpMethod: HttpMethod,
             @PathVariable(value = "-view") view: String,
             @RequestBody newBranch: Branch,
@@ -156,7 +156,7 @@ class BranchesRestController {
 
 
     @DeleteMapping(value = ["one{-view}"])
-    fun delete(
+    fun deleteOne(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
                     value = "id_branch",
@@ -178,7 +178,7 @@ class BranchesRestController {
             )
 
     @DeleteMapping(value = ["one-by-speciality{-view}"])
-    fun deleteBySpeciality(
+    fun deleteOneBySpeciality(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
                     value = "id_speciality",

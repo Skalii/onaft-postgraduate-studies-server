@@ -127,7 +127,7 @@ class DepartmentsRestController {
     @RequestMapping(
             value = ["one{-view}"],
             method = [POST, PUT])
-    fun save(
+    fun saveOne(
             httpMethod: HttpMethod,
             @PathVariable(value = "-view") view: String,
             @RequestBody newDepartment: Department,
@@ -149,7 +149,7 @@ class DepartmentsRestController {
 
 
     @DeleteMapping(value = ["one{-view}"])
-    fun delete(
+    fun deleteOne(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
                     value = "id_department",

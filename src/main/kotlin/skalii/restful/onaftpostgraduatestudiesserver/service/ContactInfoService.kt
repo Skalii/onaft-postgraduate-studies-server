@@ -9,9 +9,9 @@ interface ContactInfoService {
 
     fun get(
             idContactInfo: Int? = null,
-            idUser: Int? = null,
             phoneNumber: String? = null,
-            email: String? = null
+            email: String? = null,
+            idUser: Int? = null
     ): ContactInfo
 
     fun getAll(): MutableList<ContactInfo>
@@ -20,14 +20,14 @@ interface ContactInfoService {
             httpMethod: HttpMethod,
             newContactInfo: ContactInfo,
             findByPhoneNumber: String? = null,
-            findByEmail: String? = null
+            findByEmailUser: String? = null
     ): ContactInfo
 
     fun delete(
             idContactInfo: Int? = null,
-            idUser: Int? = null,
             phoneNumber: String? = null,
-            email: String? = null
+            email: String? = null,
+            idUser: Int? = null
     ): ContactInfo
 
 }
