@@ -127,31 +127,4 @@ data class Speciality(
         this.branch = branch
     }
 
-
-    fun fixInitializedAdd(branchesService: BranchesService): Speciality {
-        if (this.branch.idBranch == 0) {
-            if (this.branch.number != "Невідомий шифр") {
-                this.branch = branchesService.get(number = this.branch.number)
-            } else if (this.branch.name != "Невідома галузь") {
-                this.branch = branchesService.get(name = this.branch.name)
-            }
-        }
-        return this
-    }
-
-    fun fixInitializedSet(
-            specialitiesRepository: SpecialitiesRepository,
-            branchesService: BranchesService
-    ): Speciality {
-        if (!this::branch.isInitialized) {
-            if (this.branch.number != "Невідомий шифр") {
-                this.branch = specialitiesRepository.get(this.number).branch
-            } else if (this.branch.name != "Невідома галузь") {
-                this.branch = specialitiesRepository.get(name = this.name).branch
-            }
-        }
-        fixInitializedAdd(branchesService)
-        return this
-    }
-
 }
