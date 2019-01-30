@@ -51,7 +51,7 @@ class ScientificLinksServiceImpl : ScientificLinksService {
                                     phoneNumberUser,
                                     idUser,
                                     idContactInfo
-                            )
+                            ).idUser
                     )
                 }
             }
@@ -82,12 +82,11 @@ class ScientificLinksServiceImpl : ScientificLinksService {
                                 || findByEmailUser != null) {
                             setByUser(
                                     newScientificLinks,
-                                    usersRepository.get(
+                                    findByIdUser ?: usersRepository.get(
                                             findByEmailUser,
                                             findByPhoneNumberUser,
-                                            findByIdUser,
-                                            findByIdContactInfo
-                                    )
+                                            idContactInfo = findByIdContactInfo
+                                    ).idUser
                             )
                         } else {
                             set(
@@ -123,22 +122,20 @@ class ScientificLinksServiceImpl : ScientificLinksService {
                         || googleScholarId != null
                         || scopusAuthorId != null) {
                     remove(
-                            find(
-                                    idScientificLinks,
-                                    orcid,
-                                    researcherid,
-                                    googleScholarId,
-                                    scopusAuthorId
-                            )
+                            idScientificLinks ?: find(
+                                    orcid = orcid,
+                                    researcherid = researcherid,
+                                    googleScholarId = googleScholarId,
+                                    scopusAuthorId = scopusAuthorId
+                            ).idScientificLinks
                     )
                 } else {
                     removeByUser(
-                            usersRepository.get(
+                            idUser ?: usersRepository.get(
                                     emailUser,
                                     phoneNumberUser,
-                                    idUser,
-                                    idContactInfo
-                            )
+                                    idContactInfo = idContactInfo
+                            ).idUser
                     )
                 }
             }

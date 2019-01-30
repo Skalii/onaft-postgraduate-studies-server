@@ -7,7 +7,6 @@ import org.springframework.data.repository.Repository as EmptyRepository
 import org.springframework.stereotype.Repository
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Degree
-import skalii.restful.onaftpostgraduatestudiesserver.entity.User
 
 
 @Repository
@@ -29,11 +28,6 @@ interface DegreesRepository : EmptyRepository<Degree, Int> {
             @Param("name") name: String? = null,
             @Param("branch") branch: String? = null
     ): Degree
-
-    //language=PostgresPLSQL
-    @Query(value = "select (degree_record(:#{#user.degree.idDegree})).*",
-            nativeQuery = true)
-    fun findByUser(@Param("user") user: User?): Degree
 
     //language=PostgresPLSQL
     @Query(value = """select (degree_record(
@@ -84,12 +78,8 @@ interface DegreesRepository : EmptyRepository<Degree, Int> {
 
 
     //language=PostgresPLSQL
-    @Query(value = """select (degree_delete(
-                          cast_int(:#{#degree.idDegree}),
-                          cast_degree(:#{#degree.name.value}),
-                          cast_branch(:#{#degree.branch.value})
-                      )).*""",
+    @Query(value = """select (degree_delete(cast_int(:id_degree))).*""",
             nativeQuery = true)
-    fun remove(@Param("degree") newDegree: Degree): Degree
+    fun remove(@Param("id_degree") idDegree: Int): Degree
 
 }

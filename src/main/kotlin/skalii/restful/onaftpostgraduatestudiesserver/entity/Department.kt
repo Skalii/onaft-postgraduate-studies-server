@@ -23,9 +23,6 @@ import javax.persistence.Table
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
-import skalii.restful.onaftpostgraduatestudiesserver.repository.DepartmentsRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.FacultiesRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.InstitutesRepository
 import skalii.restful.onaftpostgraduatestudiesserver.view.View.REST
 import skalii.restful.onaftpostgraduatestudiesserver.view.View.TREE
 
@@ -127,43 +124,5 @@ data class Department(
         this.institute = institute
         this.faculty = faculty
     }
-
-/*
-    fun fixInitializedAdd(
-            institutesRepository: InstitutesRepository,
-            facultiesRepository: FacultiesRepository
-    ): Department {
-        if (this.institute.idInstitute == 0
-                && this.institute.name != "Невідомий інститут") {
-            this.institute = institutesRepository.get(this.institute.name)
-        }
-        if (this.faculty.idFaculty == 0
-                && this.faculty.name != "Невідомий факультет") {
-            this.faculty = facultiesRepository.get(this.faculty.name)
-        }
-        return this
-    }
-
-    fun fixInitializedSet(
-            departmentsRepository: DepartmentsRepository,
-            institutesRepository: InstitutesRepository,
-            facultiesRepository: FacultiesRepository
-    ): Department {
-        var foundDepartment: Department? = null
-        if (!this::institute.isInitialized) {
-            foundDepartment = departmentsRepository.get(this.name)
-            this.institute = foundDepartment.institute
-        }
-        if (!this::faculty.isInitialized) {
-            this.faculty = foundDepartment?.faculty
-                    ?: departmentsRepository.get(this.name).faculty
-        }
-        fixInitializedAdd(
-                institutesRepository,
-                facultiesRepository
-        )
-        return this
-    }
-*/
 
 }

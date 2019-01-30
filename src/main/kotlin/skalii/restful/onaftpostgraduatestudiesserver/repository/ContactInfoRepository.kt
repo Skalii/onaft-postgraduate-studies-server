@@ -75,12 +75,8 @@ interface ContactInfoRepository : EmptyRepository<ContactInfo, Int> {
 
 
     //language=PostgresPLSQL
-    @Query(value = """select (contact_info_delete(
-                          cast_int(:#{#contact_info.idContactInfo}),
-                          cast_text(:#{#contact_info.phoneNumber}),
-                          cast_text(:#{#contact_info.email})
-                      )).*""",
+    @Query(value = """select (contact_info_delete(cast_int(:id_contact_info))).*""",
             nativeQuery = true)
-    fun remove(@Param("contact_info") contactInfo: ContactInfo): ContactInfo
+    fun remove(@Param("id_contact_info") idContactInfo: Int): ContactInfo
 
 }

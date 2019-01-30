@@ -4,11 +4,9 @@ package skalii.restful.onaftpostgraduatestudiesserver.repository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.data.repository.Repository as EmptyRepository
-
 import org.springframework.stereotype.Repository
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Department
-import skalii.restful.onaftpostgraduatestudiesserver.entity.User
 
 
 @Repository
@@ -28,11 +26,6 @@ interface DepartmentsRepository : EmptyRepository<Department, Int> {
             @Param("id_department") idDepartment: Int? = null,
             @Param("name") name: String? = null
     ): Department
-
-    //language=PostgresPLSQL
-    @Query(value = "select (department_record(cast_int(:#{#user.department.idDepartment}))).*",
-            nativeQuery = true)
-    fun findByUser(@Param("user") user: User?): Department
 
     //language=PostgresPLSQL
     @Query(value = """select (department_record(
@@ -83,11 +76,8 @@ interface DepartmentsRepository : EmptyRepository<Department, Int> {
 
 
     //language=PostgresPLSQL
-    @Query(value = """select (department_delete(
-                          cast_int(:#{#department.idDepartment}),
-                          cast_text(:#{#department.name})
-                      )).*""",
+    @Query(value = """select (department_delete(cast_int(:id_department))).*""",
             nativeQuery = true)
-    fun remove(@Param("department") department: Department): Department
+    fun remove(@Param("id_department") idDepartment: Int): Department
 
 }

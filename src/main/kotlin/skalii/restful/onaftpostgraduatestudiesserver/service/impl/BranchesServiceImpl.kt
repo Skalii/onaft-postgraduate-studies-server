@@ -18,7 +18,7 @@ class BranchesServiceImpl : BranchesService {
     @Autowired
     private lateinit var branchesRepository: BranchesRepository
 
-    @Autowired
+    @Autowired //todo change specialitiesRepository
     private lateinit var specialitiesRepository: SpecialitiesRepository
 
     @Autowired //todo change userRepository
@@ -48,21 +48,21 @@ class BranchesServiceImpl : BranchesService {
                 } else if (idSpeciality != null
                         || numberSpeciality != null
                         || nameSpeciality != null) {
-                    findBySpeciality(
+                    find(
                             specialitiesRepository.get(
                                     numberSpeciality,
                                     nameSpeciality,
                                     idSpeciality
-                            )
+                            ).branch.idBranch
                     )
                 } else {
-                    findByUser(
+                    find(
                             usersRepository.get(
                                     emailUser,
                                     phoneNumberUser,
                                     idUser,
                                     idContactInfo
-                            )
+                            ).speciality.branch.idBranch
                     )
                 }
             }
@@ -106,19 +106,18 @@ class BranchesServiceImpl : BranchesService {
                         || number != null
                         || name != null) {
                     remove(
-                            find(
-                                    idBranch,
-                                    number,
-                                    name
-                            )
+                            idBranch ?: find(
+                                    number = number,
+                                    name = name
+                            ).idBranch
                     )
                 } else {
-                    removeBySpeciality(
+                    remove(
                             specialitiesRepository.get(
                                     numberSpeciality,
                                     nameSpeciality,
                                     idSpeciality
-                            )
+                            ).branch.idBranch
                     )
                 }
 

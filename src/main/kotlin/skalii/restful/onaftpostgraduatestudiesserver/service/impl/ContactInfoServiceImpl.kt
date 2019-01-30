@@ -63,12 +63,11 @@ class ContactInfoServiceImpl : ContactInfoService {
     ) =
             contactInfoRepository.run {
                 remove(
-                        find(
-                                idContactInfo,
-                                idUser,
-                                phoneNumber,
-                                email
-                        )
+                        idContactInfo ?: find(
+                                idUser = idUser,
+                                phoneNumber = phoneNumber,
+                                email = email
+                        ).idContactInfo
                 )
             }
 

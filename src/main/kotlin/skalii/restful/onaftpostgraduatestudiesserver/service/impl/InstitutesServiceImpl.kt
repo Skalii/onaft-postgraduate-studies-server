@@ -43,20 +43,20 @@ class InstitutesServiceImpl : InstitutesService {
                     )
                 } else if (idDepartment != null
                         || nameDepartment != null) {
-                    findByDepartment(
+                    find(
                             departmentsRepository.find(
                                     idDepartment,
                                     name
-                            )
+                            ).institute.idInstitute
                     )
                 } else {
-                    findByUser(
+                    find(
                             usersRepository.get(
                                     emailUser,
                                     phoneNumberUser,
                                     idUser,
                                     idContactInfo
-                            )
+                            ).department.institute.idInstitute
                     )
                 }
             }
@@ -89,10 +89,9 @@ class InstitutesServiceImpl : InstitutesService {
             name: String?
     ) = institutesRepository.run {
         remove(
-                find(
-                        idInstitute,
-                        name
-                )
+                idInstitute ?: find(
+                        name = name
+                ).idInstitute
         )
     }
 

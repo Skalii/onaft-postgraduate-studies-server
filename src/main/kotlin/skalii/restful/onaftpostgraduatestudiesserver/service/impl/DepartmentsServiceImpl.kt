@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Department
 import skalii.restful.onaftpostgraduatestudiesserver.repository.DepartmentsRepository
+import skalii.restful.onaftpostgraduatestudiesserver.repository.FacultiesRepository
+import skalii.restful.onaftpostgraduatestudiesserver.repository.InstitutesRepository
 import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
 import skalii.restful.onaftpostgraduatestudiesserver.service.DepartmentsService
 
@@ -16,6 +18,12 @@ class DepartmentsServiceImpl : DepartmentsService {
 
     @Autowired
     private lateinit var departmentsRepository: DepartmentsRepository
+
+    @Autowired
+    private lateinit var institutesRepository: InstitutesRepository
+
+    @Autowired
+    private lateinit var facultiesRepository: FacultiesRepository
 
     @Autowired //todo change userRepository
     private lateinit var usersRepository: UsersRepository
@@ -36,13 +44,13 @@ class DepartmentsServiceImpl : DepartmentsService {
                             name
                     )
                 } else {
-                    findByUser(
+                    find(
                             usersRepository.get(
                                     emailUser,
                                     phoneNumberUser,
                                     idUser,
                                     idContactInfo
-                            )
+                            ).department.idDepartment
                     )
                 }
             }
@@ -62,8 +70,8 @@ class DepartmentsServiceImpl : DepartmentsService {
                     findAll(allRecords = true)
                 } else {
                     findAll(
-                            idInstitute, //todo ?: institutesService.get(name = nameInstitute).idInstitute
-                            idFaculty, //todo ?: facultiesService.get(name = nameFaculty).idFaculty
+                            idInstitute ?: institutesRepository.find(name = nameInstitute).idInstitute,
+                            idFaculty ?: facultiesRepository.find(name = nameFaculty).idFaculty,
                             allRecords
                     )
                 }
@@ -96,10 +104,9 @@ class DepartmentsServiceImpl : DepartmentsService {
             name: String?
     ) = departmentsRepository.run {
         remove(
-                find(
-                        idDepartment,
-                        name
-                )
+                idDepartment ?: find(
+                        name = name
+                ).idDepartment
         )
 
     }

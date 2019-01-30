@@ -7,8 +7,6 @@ import org.springframework.data.repository.Repository as EmptyRepository
 import org.springframework.stereotype.Repository
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Branch
-import skalii.restful.onaftpostgraduatestudiesserver.entity.Speciality
-import skalii.restful.onaftpostgraduatestudiesserver.entity.User
 
 
 @Repository
@@ -30,16 +28,6 @@ interface BranchesRepository : EmptyRepository<Branch, Int> {
             @Param("number") number: String? = null,
             @Param("name") name: String? = null
     ): Branch
-
-    //language=PostgresPLSQL
-    @Query(value = "select (branch_record(cast_int(:#{#speciality.branch.idBranch}))).*",
-            nativeQuery = true)
-    fun findBySpeciality(@Param("speciality") speciality: Speciality?): Branch
-
-    //language=PostgresPLSQL
-    @Query(value = "select (branch_record(cast_int(:#{#user.speciality.branch.idBranch}))).*",
-            nativeQuery = true)
-    fun findByUser(@Param("user") user: User?): Branch
 
     //language=PostgresPLSQL
     @Query(value = "select (branch_record(all_records => true)).*",
@@ -82,17 +70,8 @@ interface BranchesRepository : EmptyRepository<Branch, Int> {
 
 
     //language=PostgresPLSQL
-    @Query(value = """select (branch_delete(
-                          cast_int(:#{#branch.idBranch}),
-                          cast_text(:#{#branch.number}),
-                          cast_text(:#{#branch.name})
-                      )).*""",
+    @Query(value = """select (branch_delete(cast_int(:id_branch))).*""",
             nativeQuery = true)
-    fun remove(@Param("branch") branch: Branch): Branch
-
-    //language=PostgresPLSQL
-    @Query(value = "select (branch_delete(cast_int(:#{#speciality.branch.idBranch}))).*",
-            nativeQuery = true)
-    fun removeBySpeciality(@Param("speciality") speciality: Speciality?): Branch
+    fun remove(@Param("id_branch") idBranch: Int): Branch
 
 }

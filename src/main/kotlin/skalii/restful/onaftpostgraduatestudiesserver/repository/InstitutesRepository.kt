@@ -6,9 +6,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.data.repository.Repository as EmptyRepository
 import org.springframework.stereotype.Repository
 
-import skalii.restful.onaftpostgraduatestudiesserver.entity.Department
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Institute
-import skalii.restful.onaftpostgraduatestudiesserver.entity.User
 
 
 @Repository
@@ -28,16 +26,6 @@ interface InstitutesRepository : EmptyRepository<Institute, Int> {
             @Param("id_institute") idInstitute: Int? = null,
             @Param("name") name: String? = null
     ): Institute
-
-    //language=PostgresPLSQL
-    @Query(value = "select (institute_record(cast_int(:#{#department.institute.idInstitute}))).*",
-            nativeQuery = true)
-    fun findByDepartment(@Param("department") department: Department?): Institute
-
-    //language=PostgresPLSQL
-    @Query(value = "select (institute_record(cast_int(:#{#user.department.institute.idInstitute}))).*",
-            nativeQuery = true)
-    fun findByUser(@Param("user") user: User?): Institute
 
     //language=PostgresPLSQL
     @Query(value = "select (institute_record(all_records => true)).*",
@@ -80,11 +68,8 @@ interface InstitutesRepository : EmptyRepository<Institute, Int> {
 
 
     //language=PostgresPLSQL
-    @Query(value = """select (institute_delete(
-                          cast_int(:id_institute),
-                          cast_text(:name)
-                      )).*""",
+    @Query(value = """select (institute_delete(cast_int(:id_institute))).*""",
             nativeQuery = true)
-    fun remove(@Param("institute") newInstitute: Institute): Institute
+    fun remove(@Param("id_institute") idInstitute: Int): Institute
 
 }

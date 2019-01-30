@@ -38,13 +38,13 @@ class DegreesServiceImpl : DegreesService {
                             branch
                     )
                 } else {
-                    findByUser(
+                    find(
                             usersRepository.get(
                                     emailUser,
                                     phoneNumberUser,
                                     idUser,
                                     idContactInfo
-                            )
+                            ).degree?.idDegree
                     )
                 }
             }
@@ -101,11 +101,10 @@ class DegreesServiceImpl : DegreesService {
     ) =
             degreesRepository.run {
                 remove(
-                        find(
-                                idDegree,
-                                name,
-                                branch
-                        )
+                        idDegree ?: find(
+                                name = name,
+                                branch = branch
+                        ).idDegree
                 )
             }
 

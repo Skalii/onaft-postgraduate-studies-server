@@ -23,9 +23,9 @@ import javax.persistence.Table
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
-import skalii.restful.onaftpostgraduatestudiesserver.repository.SectionsRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
-import skalii.restful.onaftpostgraduatestudiesserver.view.View
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.REST
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.STUDENT_TREE
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.TREE
 
 
 @Entity(name = "Section")
@@ -57,14 +57,14 @@ data class Section(
                 generator = "sections_seq")
         @Id
         @get:JsonProperty(value = "id_section")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         val idSection: Int = 0,
 
         @Column(name = "number",
                 nullable = false)
         @get:JsonProperty(value = "number")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         val number: Int = 0,
 
@@ -72,7 +72,7 @@ data class Section(
                 nullable = false,
                 length = 200)
         @get:JsonProperty(value = "title")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         @Size(max = 200)
         val title: String = ""
@@ -81,7 +81,7 @@ data class Section(
 
     @JsonIgnoreProperties(value = ["section"])
     @get:JsonProperty(value = "tasks")
-    @JsonView(View.STUDENT_TREE::class)
+    @JsonView(STUDENT_TREE::class)
     @OneToMany(
             targetEntity = Task::class,
             mappedBy = "section")
@@ -94,7 +94,7 @@ data class Section(
             foreignKey = ForeignKey(name = "sections_users_fkey"))
     @JsonIgnoreProperties(value = ["students", "sections"])
     @get:JsonProperty(value = "user")
-    @JsonView(View.TREE::class)
+    @JsonView(TREE::class)
     @ManyToOne(
             targetEntity = User::class,
             fetch = EAGER,
@@ -119,39 +119,6 @@ data class Section(
             title
     ) {
         this.user = user
-    }
-
-
-    fun fixInitializedAdd(usersRepository: UsersRepository): Section {
-        if (this.user.idUser == 0) {
-            if (this.user.contactInfo.email != "Невідомий email") {
-                this.user = usersRepository.get(
-                        this.user.contactInfo.email
-                )
-            } else if (this.user.contactInfo.phoneNumber != "Невідомий номер телефону") {
-                this.user = usersRepository.get(
-                        phoneNumber = this.user.contactInfo.phoneNumber
-                )
-            }
-        }
-        return this
-    }
-
-    fun fixInitializedSet(
-            sectionsRepository: SectionsRepository,
-            usersRepository: UsersRepository
-    ): Section {
-        if (!this::user.isInitialized) {
-            this.user = sectionsRepository.get(
-                    usersRepository.get(
-                            this.idSection
-                    ).idUser,
-                    this.number,
-                    this.title
-            ).user
-        }
-        fixInitializedAdd(usersRepository)
-        return this
     }
 
 }

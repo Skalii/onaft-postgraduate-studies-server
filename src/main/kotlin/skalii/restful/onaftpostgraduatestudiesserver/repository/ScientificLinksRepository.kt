@@ -7,7 +7,6 @@ import org.springframework.data.repository.Repository as EmptyRepository
 import org.springframework.stereotype.Repository
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.ScientificLinks
-import skalii.restful.onaftpostgraduatestudiesserver.entity.User
 
 
 @Repository
@@ -35,11 +34,9 @@ interface ScientificLinksRepository : EmptyRepository<ScientificLinks, Int> {
     ): ScientificLinks
 
     //language=PostgresPLSQL
-    @Query(value = """select (scientific_links_record(
-                          _id_user => cast_text(:#{#user.idUser})
-                      )).*""",
+    @Query(value = """select (scientific_links_record(_id_user => cast_text(:id_user))).*""",
             nativeQuery = true)
-    fun findByUser(@Param("user") user: User): ScientificLinks
+    fun findByUser(@Param("id_user") idUser: Int): ScientificLinks
 
     //language=PostgresPLSQL
     @Query(value = "select (scientific_links_record(all_records => true)).*",
@@ -91,13 +88,12 @@ interface ScientificLinksRepository : EmptyRepository<ScientificLinks, Int> {
                           cast_text(:#{#scientific_links.researcherid}),
                           cast_text(:#{#scientific_links.googleScholarId}),
                           cast_text(:#{#scientific_links.scopusAuthorId}),
-                          cast_int(:#{#scientific_links.idScientificLinks}),
-                          cast_int(:#{#user.idUser})
+                          _id_user => cast_int(:id_user)
                       )).*""",
             nativeQuery = true)
     fun setByUser(
             @Param("scientific_links") newScientificLinks: ScientificLinks,
-            @Param("user") findByUser: User
+            @Param("id_user") findByIdUser: Int
     ): ScientificLinks
 
 
@@ -105,21 +101,13 @@ interface ScientificLinksRepository : EmptyRepository<ScientificLinks, Int> {
 
 
     //language=PostgresPLSQL
-    @Query(value = """select (scientific_links_delete(
-                          cast_int(:#{#scientific_links.idScientificLinks}),
-                          _orcid =>  cast_text(:#{#scientific_links.orcid}),
-                          _researcherid => cast_text(:#{#scientific_links.researcherid}),
-                          _google_scholar_id => cast_text(:#{#scientific_links.googleScholarId}),
-                          _scopus_author_id => cast_text(:#{#scientific_links.scopusAuthorId})
-                      )).*""",
+    @Query(value = """select (scientific_links_delete(cast_int(:id_scientific_links))).*""",
             nativeQuery = true)
-    fun remove(@Param("scientific_links") scientificLinks: ScientificLinks): ScientificLinks
+    fun remove(@Param("id_scientific_links") idScientificLinks: Int): ScientificLinks
 
     //language=PostgresPLSQL
-    @Query(value = """select (scientific_links_delete(
-                          cast_int(:#{#user.idUser})
-                      )).*""",
+    @Query(value = """select (scientific_links_delete(_id_user => cast_int(:id_user))).*""",
             nativeQuery = true)
-    fun removeByUser(@Param("user") user: User): ScientificLinks
+    fun removeByUser(@Param("id_user") idUser: Int): ScientificLinks
 
 }
