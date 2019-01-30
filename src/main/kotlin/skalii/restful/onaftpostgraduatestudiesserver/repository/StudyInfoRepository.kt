@@ -1,16 +1,16 @@
 package skalii.restful.onaftpostgraduatestudiesserver.repository
 
 
-import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import org.springframework.data.repository.Repository as EmptyRepository
 import org.springframework.stereotype.Repository
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.StudyInfo
 
 
 @Repository
-interface StudyInfoRepository : JpaRepository<StudyInfo, Int> {
+interface StudyInfoRepository : EmptyRepository<StudyInfo, Int> {
 
 
     /** ============================== GET / SELECT ============================== */
@@ -22,7 +22,7 @@ interface StudyInfoRepository : JpaRepository<StudyInfo, Int> {
                           cast_int(:id_user)
                       )).*""",
             nativeQuery = true)
-    fun get(
+    fun find(
             @Param("id_study_info") idStudyInfo: Int? = null,
             @Param("id_user") idUser: Int? = null
     ): StudyInfo
@@ -30,7 +30,7 @@ interface StudyInfoRepository : JpaRepository<StudyInfo, Int> {
     //language=PostgresPLSQL
     @Query(value = "select (study_info_record(all_records => true)).*",
             nativeQuery = true)
-    fun getAll(): MutableList<StudyInfo>
+    fun findAll(): MutableList<StudyInfo>
 
 
     /** ============================== ADD / INSERT INTO ============================== */
@@ -38,20 +38,14 @@ interface StudyInfoRepository : JpaRepository<StudyInfo, Int> {
 
     //language=PostgresPLSQL
     @Query(value = """select (study_info_insert(
-                          cast_int(:year),
-                          cast_form(:form),
-                          cast_basis(:basis),
-                          cast_text(:theme_title),
-                          cast_int(:id_instructor)
+                          cast_int(:#{#study_info.year}),
+                          cast_form(:#{#study_info.form}),
+                          cast_basis(:#{#study_info.basis}),
+                          cast_text(:#{#study_info.themeTitle}),
+                          cast_int(:#{#study_info.instructor.idUser})
                       )).*""",
             nativeQuery = true)
-    fun add(
-            @Param("year") year: Int,
-            @Param("form") form: String,
-            @Param("basis") basis: String,
-            @Param("theme_title") themeTitle: String,
-            @Param("id_instructor") idInstructor: Int
-    ): StudyInfo
+    fun add(@Param("study_info") newStudyInfo: StudyInfo): StudyInfo
 
 
     /** ============================== SET / UPDATE ============================== */
@@ -64,14 +58,13 @@ interface StudyInfoRepository : JpaRepository<StudyInfo, Int> {
                           cast_basis(:#{#study_info.basis.value}),
                           cast_text(:#{#study_info.themeTitle}),
                           cast_int(:#{#study_info.instructor.idUser}),
-                          cast_int(:id_study_info),
+                          cast_int(:#{#study_info.idStudyInfo}),
                           cast_int(:id_user)
                       )).*""",
             nativeQuery = true)
     fun set(
-            @Param("study_info") changedStudyInfo: StudyInfo,
-            @Param("id_study_info") idStudyInfo: Int? = null,
-            @Param("id_user") idUser: Int? = null
+            @Param("study_info") newStudyInfo: StudyInfo,
+            @Param("id_user") findByIdUser: Int? = null
 
     ): StudyInfo
 
@@ -80,14 +73,8 @@ interface StudyInfoRepository : JpaRepository<StudyInfo, Int> {
 
 
     //language=PostgresPLSQL
-    @Query(value = """select (study_info_delete(
-                          cast_int(:id_study_info),
-                          cast_int(:id_user)
-                      )).*""",
+    @Query(value = """select (study_info_delete(cast_int(:id_study_info))).*""",
             nativeQuery = true)
-    fun delete(
-            @Param("id_study_info") idStudyInfo: Int? = null,
-            @Param("id_user") idUser: Int? = null
-    ): StudyInfo
+    fun remove(@Param("id_study_info") idStudyInfo: Int): StudyInfo
 
 }

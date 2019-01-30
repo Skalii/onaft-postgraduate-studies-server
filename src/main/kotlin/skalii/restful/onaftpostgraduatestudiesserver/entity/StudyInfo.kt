@@ -25,16 +25,17 @@ import javax.validation.constraints.Size
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.enum.StudyBasis
 import skalii.restful.onaftpostgraduatestudiesserver.entity.enum.StudyForm
-import skalii.restful.onaftpostgraduatestudiesserver.repository.StudyInfoRepository
-import skalii.restful.onaftpostgraduatestudiesserver.view.View
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.REST
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.TREE
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.INSTRUCTOR_TREE
+import skalii.restful.onaftpostgraduatestudiesserver.view.View.STUDENT_TREE
 
 
 @Entity(name = "StudyInfo")
 @JsonPropertyOrder(
         value = [
             "id_study_info", "year", "form", "basis",
-            "theme_title", "instructor", "user"
-        ])
+            "theme_title", "instructor", "user"])
 @SequenceGenerator(
         name = "study_info_seq",
         sequenceName = "study_info_id_study_info_seq",
@@ -58,14 +59,14 @@ data class StudyInfo(
                 generator = "study_info_seq")
         @Id
         @get:JsonProperty(value = "id_study_info")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         val idStudyInfo: Int = 0,
 
         @Column(name = "year",
                 nullable = false)
         @get:JsonProperty(value = "year")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         val year: Int = 0,
 
@@ -73,7 +74,7 @@ data class StudyInfo(
                 nullable = false)
         @Convert(converter = StudyForm.Companion.EnumConverter::class)
         @get:JsonProperty(value = "form")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         val form: StudyForm = StudyForm.EMPTY,
 
@@ -81,7 +82,7 @@ data class StudyInfo(
                 nullable = false)
         @Convert(converter = StudyBasis.Companion.EnumConverter::class)
         @get:JsonProperty(value = "basis")
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         @NotNull
         val basis: StudyBasis = StudyBasis.EMPTY,
 
@@ -91,7 +92,7 @@ data class StudyInfo(
         @get:JsonProperty(value = "theme_title")
         @NotNull
         @Size(max = 200)
-        @JsonView(View.REST::class)
+        @JsonView(REST::class)
         val themeTitle: String = ""
 
 ) {
@@ -101,7 +102,7 @@ data class StudyInfo(
             foreignKey = ForeignKey(name = "study_info_instructors_fkey"))
     @JsonIgnoreProperties(value = ["study_info", "students", "sections"])
     @get:JsonProperty(value = "instructor")
-    @JsonView(View.STUDENT_TREE::class)
+    @JsonView(STUDENT_TREE::class)
     @ManyToOne(
             targetEntity = User::class,
             fetch = EAGER,
@@ -110,7 +111,7 @@ data class StudyInfo(
 
     @JsonIgnoreProperties(value = ["study_info", "students", "sections"])
     @get:JsonProperty(value = "user")
-    @JsonView(View.TREE::class, View.STUDENT_TREE::class, View.INSTRUCTOR_TREE::class)
+    @JsonView(TREE::class, STUDENT_TREE::class, INSTRUCTOR_TREE::class)
     @OneToOne(
             targetEntity = User::class,
             fetch = EAGER,
@@ -146,13 +147,6 @@ data class StudyInfo(
         this.user = user
     }
 
-
-    fun fixInitializedSet(studyInfoRepository: StudyInfoRepository): StudyInfo {
-        if (!this::instructor.isInitialized) {
-            this.instructor = studyInfoRepository.get(idUser = this.user?.idUser).instructor
-        }
-        return this
-    }
 
     override fun toString() =
             """StudyInfo(

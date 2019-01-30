@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonView
-import skalii.restful.onaftpostgraduatestudiesserver.repository.SpecialitiesRepository
-import skalii.restful.onaftpostgraduatestudiesserver.service.BranchesService
 
 import javax.persistence.Column
 import javax.persistence.Entity
