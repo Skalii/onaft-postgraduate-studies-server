@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Section
 import skalii.restful.onaftpostgraduatestudiesserver.repository.SectionsRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.TasksRepository
 import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
 import skalii.restful.onaftpostgraduatestudiesserver.service.SectionsService
 
@@ -17,9 +16,6 @@ class SectionsServiceImpl : SectionsService {
 
     @Autowired
     private lateinit var sectionsRepository: SectionsRepository
-
-    @Autowired //todo change tasksRepository
-    private lateinit var tasksRepository: TasksRepository
 
     @Autowired //todo change userRepository
     private lateinit var usersRepository: UsersRepository
@@ -31,42 +27,18 @@ class SectionsServiceImpl : SectionsService {
             idUser: Int?,
             idContactInfo: Int?,
             phoneNumberUser: String?,
-            emailUser: String?,
-            idTask: Int?,
-            numberTask: Int?,
-            titleTask: String?
+            emailUser: String?
     ) =
-            sectionsRepository.run {
-                if (idTask != null ||
-                        numberTask != null
-                        || titleTask != null) {
-                    find(
-                            tasksRepository.get(
-                                    //numberSection,
-                                    //titleSection,
-                                    idUser = idUser ?: usersRepository.get(
-                                            emailUser,
-                                            phoneNumberUser,
-                                            idContactInfo = idContactInfo
-                                    ).idUser,
-                                    number = numberTask,
-                                    title = titleTask,
-                                    idTask = idTask
-                            ).section.idSection
-                    )
-                } else {
-                    find(
-                            idSection,
-                            idUser ?: usersRepository.get(
-                                    emailUser,
-                                    phoneNumberUser,
-                                    idContactInfo = idContactInfo
-                            ).idUser,
-                            number,
-                            title
-                    )
-                }
-            }
+            sectionsRepository.find(
+                    idSection,
+                    idUser ?: usersRepository.get(
+                            emailUser,
+                            phoneNumberUser,
+                            idContactInfo = idContactInfo
+                    ).idUser,
+                    number,
+                    title
+            )
 
     override fun getAll(
             idUser: Int?,
@@ -93,30 +65,25 @@ class SectionsServiceImpl : SectionsService {
             findByEmailUser: String?
     ) =
             sectionsRepository.run {
+                val foundIdUser = findByIdUser ?: usersRepository.get(
+                        findByEmailUser,
+                        findByPhoneNumberUser,
+                        idContactInfo = findByIdContactInfo
+                ).idUser
                 when {
                     httpMethod.matches("POST") -> {
-                        add(newSection)
+                        add(
+                                newSection,
+                                foundIdUser
+                        )
                     }
                     httpMethod.matches("PUT") -> {
-                        if (findByIdUser != null
-                                || findByIdContactInfo != null
-                                || findByPhoneNumberUser != null
-                                || findByEmailUser != null) {
-                            setByUser(
-                                    newSection,
-                                    findByIdUser ?: usersRepository.get(
-                                            findByEmailUser,
-                                            findByPhoneNumberUser,
-                                            idContactInfo = findByIdContactInfo
-                                    ).idUser
-                            )
-                        } else {
-                            set(
-                                    newSection,
-                                    findByNumber,
-                                    findByTitle
-                            )
-                        }
+                        set(
+                                newSection,
+                                findByNumber,
+                                findByTitle,
+                                foundIdUser
+                        )
                     }
                     else -> {
                         find()

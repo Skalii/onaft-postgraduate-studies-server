@@ -45,12 +45,15 @@ interface SectionsRepository : EmptyRepository<Section, Int> {
 
     //language=PostgresPLSQL
     @Query(value = """select (section_insert(
-                          cast_int(:#{#section.user.idUser}),
+                          cast_int(:id_user),
                           cast_int(:#{#section.number}),
                           cast_text(:#{#section.title})
                       )).*""",
             nativeQuery = true)
-    fun add(@Param("section") newSection: Section): Section
+    fun add(
+            @Param("section") newSection: Section,
+            @Param("id_user") idUser: Int
+    ): Section
 
 
     /** ============================== SET / UPDATE ============================== */
@@ -61,7 +64,7 @@ interface SectionsRepository : EmptyRepository<Section, Int> {
                           cast_int(:#{#section.number}),
                           cast_text(:#{#section.title}),
                           cast_int(:#{#section.idSection}),
-                          cast_int(:#{#secion.user.idUser}),
+                          cast_int(:id_user),
                           cast_int(:old_number),
                           cast_text(:old_title)
                       )).*""",
@@ -69,19 +72,8 @@ interface SectionsRepository : EmptyRepository<Section, Int> {
     fun set(
             @Param("section") newSection: Section,
             @Param("old_number") findByNumber: Int? = null,
-            @Param("old_title") findByTitle: String? = null
-    ): Section
-
-    //language=PostgresPLSQL
-    @Query(value = """select (section_update(
-                          cast_int(:#{#section.number}),
-                          cast_text(:#{#section.title}),
-                          _id_user => cast_int(:id_user)
-                      )).*""",
-            nativeQuery = true)
-    fun setByUser(
-            @Param("section") newSection: Section,
-            @Param("id_user") idUser: Int
+            @Param("old_title") findByTitle: String? = null,
+            @Param("id_user") findByIdUser: Int
     ): Section
 
 

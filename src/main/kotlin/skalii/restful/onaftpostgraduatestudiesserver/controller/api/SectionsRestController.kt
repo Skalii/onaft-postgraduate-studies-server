@@ -104,44 +104,6 @@ class SectionsRestController {
                     )
             )
 
-    @GetMapping(value = ["one-by-task{-view}"])
-    fun getOneByTask(
-            @PathVariable(value = "-view") view: String,
-            @RequestParam(
-                    value = "id_user",
-                    required = false) idUser: Int?,
-            @RequestParam(
-                    value = "id_contact_info",
-                    required = false) idContactInfo: Int?,
-            @RequestParam(
-                    value = "phone_number",
-                    required = false) phoneNumber: String?,
-            @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
-            @RequestParam(
-                    value = "id_task",
-                    required = false) idTask: Int?,
-            @RequestParam(
-                    value = "number_task",
-                    required = false) numberTask: Int?,
-            @RequestParam(
-                    value = "title_task",
-                    required = false) titleTask: String?
-    ) =
-            get(
-                    view,
-                    sectionsService.get(
-                            idUser = idUser,
-                            idContactInfo = idContactInfo,
-                            phoneNumberUser = phoneNumber,
-                            emailUser = email,
-                            idTask = idTask,
-                            numberTask = numberTask,
-                            titleTask = titleTask
-                    )
-            )
-
     @GetMapping(value = ["all{-view}"])
     fun getAll(
             @PathVariable(value = "-view") view: String,

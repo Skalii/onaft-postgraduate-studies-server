@@ -1,10 +1,11 @@
 package skalii.restful.onaftpostgraduatestudiesserver.entity
 
 
-import com.fasterxml.jackson.annotation.*
-import skalii.restful.onaftpostgraduatestudiesserver.repository.SectionsRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.TasksRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.fasterxml.jackson.annotation.JsonView
 
 import java.time.Instant
 import java.util.Date
@@ -33,8 +34,7 @@ import skalii.restful.onaftpostgraduatestudiesserver.view.View.TREE
         value = [
             "id_task", "number", "title", "balkline", "deadline",
             "mark_done_user", "mark_done_instructor",
-            "timestamp_done_user", "timestamp_done_instructor", "section"
-        ])
+            "timestamp_done_user", "timestamp_done_instructor", "section"])
 @SequenceGenerator(
         name = "tasks_seq",
         sequenceName = "tasks_id_task_seq",
@@ -90,7 +90,7 @@ data class Task(
         @get:JsonProperty(value = "balkline")
         @JsonView(REST::class)
         @NotNull
-        val balkline: Date?,
+        val balkline: Date = Date.from(Instant.now()),
 
         @Column(name = "deadline",
                 nullable = false)
@@ -101,7 +101,7 @@ data class Task(
         @get:JsonProperty(value = "deadline")
         @JsonView(REST::class)
         @NotNull
-        val deadline: Date?,
+        val deadline: Date = Date.from(Instant.now()).also { it.time = it.time + 2592000000 },
 
         @Column(name = "mark_done_user")
         @get:JsonProperty(value = "mark_done_user")
@@ -170,8 +170,8 @@ data class Task(
             idTask: Int = 0,
             number: Int = 1,
             title: String = "Нове завдання",
-            balkline: Date? = Date.from(Instant.now()),
-            deadline: Date? = Date.from(Instant.now()).also { it.time = it.time + 2592000000 },
+            balkline: Date = Date.from(Instant.now()),
+            deadline: Date = Date.from(Instant.now()).also { it.time = it.time + 2592000000 },
             markDoneUser: Boolean? = false,
             markDoneInstructor: Boolean? = false,
             link: String? = "Невідоме посилання",
@@ -191,97 +191,6 @@ data class Task(
             timestampDoneInstructor
     ) {
         this.section = section
-    }
-
-
-    fun fixInitializedAdd(
-            sectionsRepository: SectionsRepository,
-            usersRepository: UsersRepository,
-            email: String? = null,
-            phoneNumber: String? = null,
-            idUser: Int? = null
-    ): Task {
-
-        try {
-            section.user.idUser
-        } catch (e: Exception) {
-            if ((email != null
-                            && email != "Невідомий email")
-                    || (phoneNumber != null
-                            && phoneNumber != "Невідомий номер телефону")
-                    || (idUser != null
-                            && idUser != 0)) {
-                section.user =
-                        usersRepository.get(
-                                email,
-                                phoneNumber,
-                                idUser
-                        )
-            }
-        }
-
-        if (this.section.idSection == 0) {
-            if (this.section.user.idUser == 0) {
-                if (this.section.user.contactInfo.email != "Невідомий email") {
-                    this.section.user = usersRepository.get(
-                            this.section.user.contactInfo.email
-                    )
-                } else if (this.section.user.contactInfo.phoneNumber != "Невідомий номер телефону") {
-                    this.section.user = usersRepository.get(
-                            phoneNumber = this.section.user.contactInfo.phoneNumber
-                    )
-                }
-            }
-
-            this.section = sectionsRepository.get(
-                    this.section.user.idUser,
-                    this.section.number,
-                    this.section.title
-            )
-        }
-        return this
-    }
-
-    fun fixInitializedSet(
-            tasksRepository: TasksRepository,
-            sectionsRepository: SectionsRepository,
-            usersRepository: UsersRepository,
-            email: String? = null,
-            phoneNumber: String? = null,
-            idUser: Int? = null,
-            user: User? = null
-    ): Task {
-
-        if (!this::section.isInitialized) {
-            this.section = tasksRepository.get(
-                    idUser = if (user != null
-                            && user.idUser != 0) {
-                        user.idUser
-                    } else {
-                        usersRepository.get(
-                                this.section.user.contactInfo.email,
-                                this.section.user.contactInfo.phoneNumber
-                        ).idUser
-                    }
-            ).section
-        }
-
-        if (user != null) {
-            try {
-                this.section.user
-            } catch (e: Exception) {
-                this.section.user = user
-            }
-        }
-
-        fixInitializedAdd(
-                sectionsRepository,
-                usersRepository,
-                email,
-                phoneNumber,
-                idUser
-        )
-        return this
     }
 
 }

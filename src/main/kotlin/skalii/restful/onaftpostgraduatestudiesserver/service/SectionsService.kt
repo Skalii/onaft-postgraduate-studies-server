@@ -15,10 +15,7 @@ interface SectionsService {
             idUser: Int? = null,
             idContactInfo: Int? = null,
             phoneNumberUser: String? = null,
-            emailUser: String? = null,
-            idTask: Int? = null,
-            numberTask: Int? = null,
-            titleTask: String? = null
+            emailUser: String? = null
     ): Section
 
     fun getAll(

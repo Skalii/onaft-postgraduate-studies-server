@@ -1,41 +1,35 @@
 package skalii.restful.onaftpostgraduatestudiesserver.controller.api
 
 
-import java.time.Instant
-
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RequestMethod.PUT
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.Task
-import skalii.restful.onaftpostgraduatestudiesserver.repository.ContactInfoRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.SectionsRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.TasksRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
-import skalii.restful.onaftpostgraduatestudiesserver.view.Json
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
+import skalii.restful.onaftpostgraduatestudiesserver.service.TasksService
+import skalii.restful.onaftpostgraduatestudiesserver.view.Json.Companion.get
 
 
 @RequestMapping(
         value = ["/api/tasks"],
         produces = [APPLICATION_JSON_UTF8_VALUE])
 @RestController
-class TasksRestController(
-        val contactInfoRepository: ContactInfoRepository,
-        val sectionsRepository: SectionsRepository,
-        val tasksRepository: TasksRepository,
-        val usersRepository: UsersRepository
-) {
+class TasksRestController {
+
+    @Autowired
+    private lateinit var tasksService: TasksService
 
 
     /** ============================== GET requests ============================== */
@@ -46,32 +40,27 @@ class TasksRestController(
             @PathVariable(value = "-view") view: String,
             @AuthenticationPrincipal authUser: UserDetails,
             @RequestParam(
-                    value = "section_number",
-                    required = false) sectionNumber: Int?,
+                    value = "number",
+                    required = false) number: Int?,
             @RequestParam(
-                    value = "section_title",
-                    required = false) sectionTitle: String?,
+                    value = "title",
+                    required = false) title: String?,
             @RequestParam(
-                    value = "task_number",
-                    required = false) taskNumber: Int?,
+                    value = "number_section",
+                    required = false) numberSection: Int?,
             @RequestParam(
-                    value = "task_title",
-                    required = false) taskTitle: String?
+                    value = "title_section",
+                    required = false) titleSection: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    usersRepository.get(authUser.username).run {
-                        tasksRepository.get(
-                                sectionsRepository.get(
-                                        idUser,
-                                        sectionNumber,
-                                        sectionTitle
-                                ),
-                                idUser,
-                                taskNumber,
-                                taskTitle
-                        )
-                    }
+                    tasksService.get(
+                            number = number,
+                            title = title,
+                            numberSection = numberSection,
+                            titleSection = titleSection,
+                            emailUser = authUser.username
+                    )
             )
 
     @GetMapping(value = ["my-all{-view}"])
@@ -79,12 +68,10 @@ class TasksRestController(
             @PathVariable(value = "-view") view: String,
             @AuthenticationPrincipal authUser: UserDetails
     ) =
-            Json.get(
+            get(
                     view,
-                    tasksRepository.getAll(
-                            idUser = usersRepository.get(
-                                    authUser.username
-                            ).idUser
+                    tasksService.getAll(
+                            emailUser = authUser.username
                     )
             )
 
@@ -93,22 +80,18 @@ class TasksRestController(
             @PathVariable(value = "-view") view: String,
             @AuthenticationPrincipal authUser: UserDetails,
             @RequestParam(
-                    value = "section_number",
-                    required = false) sectionNumber: Int?,
+                    value = "number_section",
+                    required = false) numberSection: Int?,
             @RequestParam(
-                    value = "section_title",
-                    required = false) sectionTitle: String?
+                    value = "title_section",
+                    required = false) titleSection: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    tasksRepository.getAll(
-                            sectionsRepository.get(
-                                    usersRepository.get(
-                                            authUser.username
-                                    ).idUser,
-                                    sectionNumber,
-                                    sectionTitle
-                            ).idSection
+                    tasksService.getAll(
+                            numberSection = numberSection,
+                            titleSection = titleSection,
+                            emailUser = authUser.username
                     )
             )
 
@@ -116,300 +99,247 @@ class TasksRestController(
     fun getOne(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
-                    value = "section_number",
-                    required = false) sectionNumber: Int?,
+                    value = "id_task",
+                    required = false) idTask: Int?,
             @RequestParam(
-                    value = "section_title",
-                    required = false) sectionTitle: String?,
+                    value = "number",
+                    required = false) number: Int?,
+            @RequestParam(
+                    value = "title",
+                    required = false) title: String?,
             @RequestParam(
                     value = "id_section",
                     required = false) idSection: Int?,
             @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
+                    value = "number_section",
+                    required = false) numberSection: Int?,
+            @RequestParam(
+                    value = "title_section",
+                    required = false) titleSection: String?,
+            @RequestParam(
+                    value = "id_user",
+                    required = false) idUser: Int?,
+            @RequestParam(
+                    value = "id_contact_info",
+                    required = false) idContactInfo: Int?,
             @RequestParam(
                     value = "phone_number",
                     required = false) phoneNumber: String?,
             @RequestParam(
-                    value = "id_user",
-                    required = false) _idUser: Int?,
-            @RequestParam(
-                    value = "task_number",
-                    required = false) number: Int?,
-            @RequestParam(
-                    value = "task_title",
-                    required = false) title: String?,
-            @RequestParam(
-                    value = "id_task",
-                    required = false) idTask: Int?
+                    value = "email",
+                    required = false) email: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    usersRepository.get(
-                            email,
+                    tasksService.get(
+                            idTask,
+                            number,
+                            title,
+                            idSection,
+                            numberSection,
+                            titleSection,
+                            idUser,
+                            idContactInfo,
                             phoneNumber,
-                            _idUser
-                    ).run {
-                        tasksRepository.get(
-                                sectionsRepository.get(
-                                        idUser,
-                                        sectionNumber,
-                                        sectionTitle,
-                                        idSection
-                                ),
-                                idUser,
-                                number,
-                                title,
-                                idTask
-                        )
-                    }
+                            email
+                    )
             )
 
     @GetMapping(value = ["all{-view}"])
     fun getAll(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
-                    value = "section_number",
-                    required = false) sectionNumber: Int?,
-            @RequestParam(
-                    value = "section_title",
-                    required = false) sectionTitle: String?,
-            @RequestParam(
                     value = "id_section",
                     required = false) idSection: Int?,
             @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
+                    value = "number_section",
+                    required = false) numberSection: Int?,
             @RequestParam(
-                    value = "phone_number",
-                    required = false) phoneNumber: String?,
+                    value = "title_section",
+                    required = false) titleSection: String?,
             @RequestParam(
                     value = "id_user",
-                    required = false) _idUser: Int?
-    ) =
-            Json.get(
-                    view,
-                    usersRepository.get(
-                            email,
-                            phoneNumber,
-                            _idUser
-                    ).run {
-                        tasksRepository.getAll(
-                                sectionsRepository.get(
-                                        idUser,
-                                        sectionNumber,
-                                        sectionTitle,
-                                        idSection
-                                ).idSection,
-                                idUser
-                        )
-                    }
-            )
-
-
-    /** ============================== POST requests ============================== */
-
-
-    @PostMapping(value = ["my{-view}"])
-    fun addMy(
-            @PathVariable(value = "-view") view: String,
-            @AuthenticationPrincipal authUser: UserDetails,
-            @RequestBody newTask: Task
-    ) =
-            Json.get(
-                    view,
-                    tasksRepository.add(
-                            newTask.fixInitializedAdd(
-                                    sectionsRepository,
-                                    usersRepository,
-                                    authUser.username
-                            ).section.idSection,
-                            newTask.title,
-                            newTask.balkline.toString(),
-                            newTask.deadline.toString(),
-                            newTask.link
-                    )
-            )
-
-
-    /** ============================== PUT requests ============================== */
-
-
-    @PutMapping(value = ["my{-view}"])
-    fun setMy(
-            @PathVariable(value = "-view") view: String,
-            @RequestBody changedTask: Task,
-            @AuthenticationPrincipal authUser: UserDetails,
+                    required = false) idUser: Int?,
             @RequestParam(
-                    value = "number",
-                    required = false) number: Int?,
-            @RequestParam(
-                    value = "title",
-                    required = false) title: String?,
-            @RequestParam(
-                    value = "id_task",
-                    required = false) idTask: Int?
-    ) =
-            Json.get(
-                    view,
-                    tasksRepository.set(
-                            changedTask.fixInitializedSet(
-                                    tasksRepository,
-                                    sectionsRepository,
-                                    usersRepository,
-                                    authUser.username
-                            ),
-                            changedTask.section,
-                            changedTask.section.user.idUser,
-                            number,
-                            title,
-                            idTask
-                    )
-
-            )
-
-    @PutMapping(value = ["my-mark-student{-view}"])
-    fun setMyMarkUser(
-            @PathVariable(value = "-view") view: String,
-            @RequestBody changedTask: Task,
-            @AuthenticationPrincipal authUser: UserDetails
-    ) =
-            tasksRepository.run {
-                val student = usersRepository.get(authUser.username)
-                val found =
-                        setMarkUser(
-                                changedTask.markDoneUser,
-                                get(
-                                        changedTask.fixInitializedSet(
-                                                tasksRepository,
-                                                sectionsRepository,
-                                                usersRepository,
-                                                user = student
-                                        ).section,
-                                        student.idUser,
-                                        changedTask.number,
-                                        changedTask.title
-                                ).idTask
-                        )
-                Json.get(
-                        view,
-                        found,
-                        "mark_done_user\":${found.markDoneUser}"
-                                to "mark_done_user\":${changedTask.markDoneUser}",
-                        "timestamp_done_user\":${found.timestampDoneUser}".run {
-                            if (found.markDoneUser == true) {
-                                "timestamp_done_user\":\"${found.timestampDoneUser}".substring(0, 41) + "\""
-                            } else "timestamp_done_user\":${found.timestampDoneUser}"
-                        }
-                                to "timestamp_done_user\":${
-                        if (changedTask.markDoneUser == true) {
-                            "\"${DateTimeFormatter
-                                    .ofPattern("yyyy-MM-dd HH:mm:ss")
-                                    .withZone(ZoneOffset.UTC)
-                                    .format(Instant.now())}\""
-                        } else {
-                            "null"
-                        }
-                        }"
-                )
-            }
-
-    @PutMapping(value = ["my-mark-instructor{-view}"])
-    fun setMyMarkInstructor(
-            @PathVariable(value = "-view") view: String,
-            @RequestBody changedTask: Task,
-            @AuthenticationPrincipal authUser: UserDetails,
-            @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
+                    value = "id_contact_info",
+                    required = false) idContactInfo: Int?,
             @RequestParam(
                     value = "phone_number",
                     required = false) phoneNumber: String?,
             @RequestParam(
-                    value = "id_student",
-                    required = false) idUser: Int?
+                    value = "email",
+                    required = false) email: String?
     ) =
-            tasksRepository.run {
-                val student = usersRepository.get(
-                        email,
-                        phoneNumber,
-                        idUser
-                )
-                val found = get(
-                        changedTask.fixInitializedSet(
-                                tasksRepository,
-                                sectionsRepository,
-                                usersRepository,
-                                student.contactInfo.email
-                        ).section,
-                        student.idUser,
-                        changedTask.number,
-                        changedTask.title
-                )
-                if (student.studyInfo?.instructor?.contactInfo?.email == authUser.username) {
-                    setMarkInstructor(
-                            changedTask.markDoneInstructor,
-                            found.idTask
-                    )
-                    println("this")
-                    return@run Json.get(
-                            view,
-                            found,
-                            "mark_done_instructor\":${found.markDoneInstructor}"
-                                    to "mark_done_instructor\":${changedTask.markDoneInstructor}",
-                            "timestamp_done_instructor\":${found.timestampDoneInstructor}".run {
-                                if (found.markDoneInstructor == true) {
-                                    "timestamp_done_instructor\":\"${found.timestampDoneInstructor}".substring(0, 47) + "\""
-                                } else "timestamp_done_instructor\":${found.timestampDoneInstructor}"
-                            }
-                                    to "timestamp_done_instructor\":${
-                            if (changedTask.markDoneInstructor == true) {
-                                "\"${DateTimeFormatter
-                                        .ofPattern("yyyy-MM-dd HH:mm:ss")
-                                        .withZone(ZoneOffset.UTC)
-                                        .format(Instant.now())}\""
-                            } else {
-                                "null"
-                            }
-                            }"
-                    )
-                } else {
-                    return@run Json.get(
-                            view,
-                            found
-                    )
-                }
-            }
-
-    @PutMapping(value = ["one{-view}"])
-    fun set(
-            @PathVariable(value = "-view") view: String,
-            @RequestBody changedTask: Task,
-            @RequestParam(
-                    value = "number",
-                    required = false) number: Int?,
-            @RequestParam(
-                    value = "title",
-                    required = false) title: String?,
-            @RequestParam(
-                    value = "id_task",
-                    required = false) idTask: Int?
-    ) =
-            Json.get(
+            get(
                     view,
-                    tasksRepository.set(
-                            changedTask.fixInitializedSet(
-                                    tasksRepository,
-                                    sectionsRepository,
-                                    usersRepository
-                            ),
-                            changedTask.section,
-                            changedTask.section.user.idUser,
-                            number,
-                            title,
-                            idTask
+                    tasksService.getAll(
+                            idSection,
+                            numberSection,
+                            titleSection,
+                            idUser,
+                            idContactInfo,
+                            phoneNumber,
+                            email
+                    )
+            )
+
+
+    /** ============================== POST/PUT requests ============================== */
+
+
+    @RequestMapping(
+            value = ["my-one{-view}"],
+            method = [POST, PUT])
+    fun saveMyOne(
+            httpMethod: HttpMethod,
+            @PathVariable(value = "-view") view: String,
+            @AuthenticationPrincipal authUser: UserDetails,
+            @RequestBody newTask: Task,
+            @RequestParam(
+                    value = "find_by_number",
+                    required = false) findByNumber: Int?,
+            @RequestParam(
+                    value = "find_by_title",
+                    required = false) findByTitle: String?,
+            @RequestParam(
+                    value = "find_by_id_section",
+                    required = false) findByIdSection: Int?,
+            @RequestParam(
+                    value = "find_by_number_section",
+                    required = false) findByNumberSection: Int?,
+            @RequestParam(
+                    value = "find_by_title_section",
+                    required = false) findByTitleSection: String?
+    ) =
+            get(
+                    view,
+                    tasksService.save(
+                            httpMethod,
+                            newTask,
+                            findByNumber,
+                            findByTitle,
+                            findByIdSection,
+                            findByNumberSection,
+                            findByTitleSection,
+                            findByEmailUser = authUser.username
+                    )
+            )
+
+    @RequestMapping(
+            value = ["one{-view}"],
+            method = [POST, PUT])
+    fun saveOne(
+            httpMethod: HttpMethod,
+            @PathVariable(value = "-view") view: String,
+            @RequestBody newTask: Task,
+            @RequestParam(
+                    value = "find_by_number",
+                    required = false) findByNumber: Int?,
+            @RequestParam(
+                    value = "find_by_title",
+                    required = false) findByTitle: String?,
+            @RequestParam(
+                    value = "find_by_id_section",
+                    required = false) findByIdSection: Int?,
+            @RequestParam(
+                    value = "find_by_number_section",
+                    required = false) findByNumberSection: Int?,
+            @RequestParam(
+                    value = "find_by_title_section",
+                    required = false) findByTitleSection: String?,
+            @RequestParam(
+                    value = "find_by_id_user",
+                    required = false) findByIdUser: Int?,
+            @RequestParam(
+                    value = "find_by_id_contact_info",
+                    required = false) findByIdContactInfo: Int?,
+            @RequestParam(
+                    value = "find_by_phone_number",
+                    required = false) findByPhoneNumberUser: String?,
+            @RequestParam(
+                    value = "find_by_email",
+                    required = false) findByEmailUser: String?
+    ) =
+            get(
+                    view,
+                    tasksService.save(
+                            httpMethod,
+                            newTask,
+                            findByNumber,
+                            findByTitle,
+                            findByIdSection,
+                            findByNumberSection,
+                            findByTitleSection,
+                            findByIdUser,
+                            findByIdContactInfo,
+                            findByPhoneNumberUser,
+                            findByEmailUser
                     )
 
+            )
+
+    @PutMapping(value = ["mark-{who}{-view}"])
+    fun saveMark(
+            @PathVariable(value = "who") whoMarked: String,
+            @PathVariable(value = "-view") view: String,
+            @RequestBody newTask: Task,
+            @AuthenticationPrincipal authUser: UserDetails,
+            @RequestParam(
+                    value = "find_by_number",
+                    required = false) findByNumber: Int?,
+            @RequestParam(
+                    value = "find_by_title",
+                    required = false) findByTitle: String?,
+            @RequestParam(
+                    value = "find_by_id_section",
+                    required = false) findByIdSection: Int?,
+            @RequestParam(
+                    value = "find_by_number_section",
+                    required = false) findByNumberSection: Int?,
+            @RequestParam(
+                    value = "find_by_title_section",
+                    required = false) findByTitleSection: String?,
+            @RequestParam(
+                    value = "find_by_id_student",
+                    required = false) findByIdStudent: Int?,
+            @RequestParam(
+                    value = "find_by_id_contact_info_student",
+                    required = false) findByIdContactInfoStudent: Int?,
+            @RequestParam(
+                    value = "find_by_phone_number_student",
+                    required = false) findByPhoneNumberStudent: String?,
+            @RequestParam(
+                    value = "find_by_email_student",
+                    required = false) findByEmailStudent: String?,
+            @RequestParam(
+                    value = "find_by_id_instructor",
+                    required = false) findByIdInstructor: Int?,
+            @RequestParam(
+                    value = "find_by_id_contact_info_instructor",
+                    required = false) findByIdContactInfoInstructor: Int?,
+            @RequestParam(
+                    value = "find_by_phone_number_instructor",
+                    required = false) findByPhoneNumberInstructor: String?,
+            @RequestParam(
+                    value = "find_by_email_instructor",
+                    required = false) findByEmailInstructor: String?
+    ) =
+            tasksService.saveMark(
+                    whoMarked,
+                    newTask,
+                    findByNumber,
+                    findByTitle,
+                    findByIdSection,
+                    findByNumberSection,
+                    findByTitleSection,
+                    findByIdStudent,
+                    findByIdContactInfoStudent,
+                    findByPhoneNumberStudent,
+                    findByEmailStudent,
+                    findByIdInstructor,
+                    findByIdContactInfoInstructor,
+                    findByPhoneNumberInstructor,
+                    findByEmailInstructor
             )
 
 
@@ -417,144 +347,138 @@ class TasksRestController(
 
 
     @DeleteMapping(value = ["my-one{-view}"])
-    fun deleteMy(
+    fun deleteMyOne(
             @PathVariable(value = "-view") view: String,
             @AuthenticationPrincipal authUser: UserDetails,
             @RequestParam(
-                    value = "section_number",
-                    required = false) sectionNumber: Int?,
+                    value = "number",
+                    required = false) number: Int?,
             @RequestParam(
-                    value = "section_title",
-                    required = false) sectionTitle: String?,
+                    value = "title",
+                    required = false) title: String?,
             @RequestParam(
-                    value = "task_number",
-                    required = false) taskNumber: Int?,
+                    value = "number_section",
+                    required = false) numberSection: Int?,
             @RequestParam(
-                    value = "task_title",
-                    required = false) taskTitle: String?
+                    value = "title_section",
+                    required = false) titleSection: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    tasksRepository.delete(
-                            sectionsRepository.get(
-                                    usersRepository.get(
-                                            authUser.username
-                                    ).idUser,
-                                    sectionNumber,
-                                    sectionTitle
-                            ).idSection,
-                            taskNumber,
-                            taskTitle
+                    tasksService.delete(
+                            number = number,
+                            title = title,
+                            numberSection = numberSection,
+                            titleSection = titleSection,
+                            emailUser = authUser.username
                     )
             )
 
     @DeleteMapping(value = ["my-all-by-section{-view}"])
-    fun deleteMyAll(
+    fun deleteMyAllBySection(
             @PathVariable(value = "-view") view: String,
             @AuthenticationPrincipal authUser: UserDetails,
             @RequestParam(
-                    value = "section_number",
-                    required = false) sectionNumber: Int?,
+                    value = "number",
+                    required = false) number: Int?,
             @RequestParam(
-                    value = "section_title",
-                    required = false) sectionTitle: String?
+                    value = "title",
+                    required = false) title: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    tasksRepository.deleteAll(
-                            sectionsRepository.get(
-                                    usersRepository.get(
-                                            authUser.username
-                                    ).idUser,
-                                    sectionNumber,
-                                    sectionTitle
-                            )
+                    tasksService.deleteAll(
+                            number = number,
+                            title = title,
+                            emailUser = authUser.username
                     )
             )
 
     @DeleteMapping(value = ["one{-view}"])
-    fun delete(
+    fun deleteOne(
             @PathVariable(value = "-view") view: String,
             @RequestParam(
-                    value = "section_number",
-                    required = false) sectionNumber: Int?,
+                    value = "id_task",
+                    required = false) idTask: Int?,
             @RequestParam(
-                    value = "section_title",
-                    required = false) sectionTitle: String?,
+                    value = "number",
+                    required = false) number: Int?,
+            @RequestParam(
+                    value = "title",
+                    required = false) title: String?,
             @RequestParam(
                     value = "id_section",
                     required = false) idSection: Int?,
             @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
+                    value = "number_section",
+                    required = false) numberSection: Int?,
             @RequestParam(
-                    value = "phone_number",
-                    required = false) phoneNumber: String?,
+                    value = "title_section",
+                    required = false) titleSection: String?,
             @RequestParam(
                     value = "id_user",
                     required = false) idUser: Int?,
             @RequestParam(
-                    value = "task_number",
-                    required = false) taskNumber: Int?,
-            @RequestParam(
-                    value = "task_title",
-                    required = false) taskTitle: String?,
-            @RequestParam(
-                    value = "id_task",
-                    required = false) idTask: Int?
-    ) =
-            Json.get(
-                    view,
-                    tasksRepository.delete(
-                            sectionsRepository.get(
-                                    idUser ?: usersRepository.get(
-                                            email,
-                                            phoneNumber
-                                    ).idUser,
-                                    sectionNumber,
-                                    sectionTitle,
-                                    idSection
-                            ).idSection,
-                            taskNumber,
-                            taskTitle,
-                            idTask
-                    )
-            )
-
-    @GetMapping(value = ["all-by-section{-view}"])
-    fun deleteAll(
-            @PathVariable(value = "-view") view: String,
-            @RequestParam(
-                    value = "section_number",
-                    required = false) sectionNumber: Int?,
-            @RequestParam(
-                    value = "section_title",
-                    required = false) sectionTitle: String?,
-            @RequestParam(
-                    value = "id_section",
-                    required = false) idSection: Int?,
-            @RequestParam(
-                    value = "email",
-                    required = false) email: String?,
+                    value = "id_contact_info",
+                    required = false) idContactInfo: Int?,
             @RequestParam(
                     value = "phone_number",
                     required = false) phoneNumber: String?,
             @RequestParam(
-                    value = "id_user",
-                    required = false) idUser: Int?
+                    value = "email",
+                    required = false) email: String?
     ) =
-            Json.get(
+            get(
                     view,
-                    tasksRepository.deleteAll(
-                            sectionsRepository.get(
-                                    idUser ?: usersRepository.get(
-                                            email,
-                                            phoneNumber
-                                    ).idUser,
-                                    sectionNumber,
-                                    sectionTitle,
-                                    idSection
-                            )
+                    tasksService.delete(
+                            idTask,
+                            number,
+                            title,
+                            idSection,
+                            numberSection,
+                            titleSection,
+                            idUser,
+                            idContactInfo,
+                            phoneNumber,
+                            email
+                    )
+            )
+
+    @GetMapping(value = ["all-by-section{-view}"])
+    fun deleteAllBySection(
+            @PathVariable(value = "-view") view: String,
+            @RequestParam(
+                    value = "id_section",
+                    required = false) idSection: Int?,
+            @RequestParam(
+                    value = "number",
+                    required = false) number: Int?,
+            @RequestParam(
+                    value = "title",
+                    required = false) title: String?,
+            @RequestParam(
+                    value = "id_user",
+                    required = false) idUser: Int?,
+            @RequestParam(
+                    value = "id_contact_info",
+                    required = false) idContactInfo: Int?,
+            @RequestParam(
+                    value = "phone_number",
+                    required = false) phoneNumber: String?,
+            @RequestParam(
+                    value = "email",
+                    required = false) email: String?
+    ) =
+            get(
+                    view,
+                    tasksService.deleteAll(
+                            idSection,
+                            number,
+                            title,
+                            idUser,
+                            idContactInfo,
+                            phoneNumber,
+                            email
                     )
             )
 

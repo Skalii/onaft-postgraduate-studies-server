@@ -39,8 +39,8 @@ interface StudyInfoRepository : EmptyRepository<StudyInfo, Int> {
     //language=PostgresPLSQL
     @Query(value = """select (study_info_insert(
                           cast_int(:#{#study_info.year}),
-                          cast_form(:#{#study_info.form}),
-                          cast_basis(:#{#study_info.basis}),
+                          cast_form(:#{#study_info.form.value}),
+                          cast_basis(:#{#study_info.basis.value}),
                           cast_text(:#{#study_info.themeTitle}),
                           cast_int(:#{#study_info.instructor.idUser})
                       )).*""",
