@@ -17,7 +17,7 @@ class ScientificLinksServiceImpl : ScientificLinksService {
     @Autowired
     private lateinit var scientificLinksRepository: ScientificLinksRepository
 
-    @Autowired //todo change userRepository
+    @Autowired
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
@@ -46,11 +46,11 @@ class ScientificLinksServiceImpl : ScientificLinksService {
                     )
                 } else {
                     findByUser(
-                            usersRepository.get(
-                                    emailUser,
-                                    phoneNumberUser,
+                            usersRepository.find(
                                     idUser,
-                                    idContactInfo
+                                    idContactInfo,
+                                    phoneNumberUser,
+                                    emailUser
                             ).idUser
                     )
                 }
@@ -82,10 +82,10 @@ class ScientificLinksServiceImpl : ScientificLinksService {
                                 || findByEmailUser != null) {
                             setByUser(
                                     newScientificLinks,
-                                    findByIdUser ?: usersRepository.get(
-                                            findByEmailUser,
-                                            findByPhoneNumberUser,
-                                            idContactInfo = findByIdContactInfo
+                                    findByIdUser ?: usersRepository.find(
+                                            idContactInfo = findByIdContactInfo,
+                                            phoneNumber = findByPhoneNumberUser,
+                                            email = findByEmailUser
                                     ).idUser
                             )
                         } else {
@@ -131,10 +131,10 @@ class ScientificLinksServiceImpl : ScientificLinksService {
                     )
                 } else {
                     removeByUser(
-                            idUser ?: usersRepository.get(
-                                    emailUser,
-                                    phoneNumberUser,
-                                    idContactInfo = idContactInfo
+                            idUser ?: usersRepository.find(
+                                    idContactInfo = idContactInfo,
+                                    phoneNumber = phoneNumberUser,
+                                    email = emailUser
                             ).idUser
                     )
                 }

@@ -17,7 +17,7 @@ class StudyInfoServiceImpl : StudyInfoService {
     @Autowired
     private lateinit var studyInfoRepository: StudyInfoRepository
 
-    @Autowired //todo change usersRepository
+    @Autowired
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
@@ -29,10 +29,10 @@ class StudyInfoServiceImpl : StudyInfoService {
     ) =
             studyInfoRepository.find(
                     idStudyInfo,
-                    idUser ?: usersRepository.get(
-                            emailUser,
-                            phoneNumberUser,
-                            idContactInfo = idContactInfo
+                    idUser ?: usersRepository.find(
+                            idContactInfo = idContactInfo,
+                            phoneNumber = phoneNumberUser,
+                            email = emailUser
                     ).idUser
             )
 
@@ -54,10 +54,10 @@ class StudyInfoServiceImpl : StudyInfoService {
                     httpMethod.matches("PUT") -> {
                         set(
                                 newStudyInfo,
-                                findByIdUser ?: usersRepository.get(
-                                        findByEmailUser,
-                                        findByPhoneNumberUser,
-                                        idContactInfo = findByIdContactInfo
+                                findByIdUser ?: usersRepository.find(
+                                        idContactInfo = findByIdContactInfo,
+                                        phoneNumber = findByPhoneNumberUser,
+                                        email = findByEmailUser
                                 ).idUser
                         )
                     }
@@ -77,10 +77,10 @@ class StudyInfoServiceImpl : StudyInfoService {
             studyInfoRepository.run {
                 remove(
                         idStudyInfo ?: find(
-                                idUser = idUser ?: usersRepository.get(
-                                        emailUser,
-                                        phoneNumberUser,
-                                        idContactInfo = idContactInfo
+                                idUser = idUser ?: usersRepository.find(
+                                        idContactInfo = idContactInfo,
+                                        phoneNumber = phoneNumberUser,
+                                        email = emailUser
                                 ).idUser
                         ).idStudyInfo
                 )

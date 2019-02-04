@@ -21,7 +21,7 @@ class InstitutesServiceImpl : InstitutesService {
     @Autowired
     private lateinit var departmentsRepository: DepartmentsRepository
 
-    @Autowired //todo change userRepository
+    @Autowired
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
@@ -51,11 +51,11 @@ class InstitutesServiceImpl : InstitutesService {
                     )
                 } else {
                     find(
-                            usersRepository.get(
-                                    emailUser,
-                                    phoneNumberUser,
+                            usersRepository.find(
                                     idUser,
-                                    idContactInfo
+                                    idContactInfo,
+                                    phoneNumberUser,
+                                    emailUser
                             ).department.institute.idInstitute
                     )
                 }

@@ -17,7 +17,7 @@ class SectionsServiceImpl : SectionsService {
     @Autowired
     private lateinit var sectionsRepository: SectionsRepository
 
-    @Autowired //todo change userRepository
+    @Autowired
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
@@ -31,10 +31,10 @@ class SectionsServiceImpl : SectionsService {
     ) =
             sectionsRepository.find(
                     idSection,
-                    idUser ?: usersRepository.get(
-                            emailUser,
-                            phoneNumberUser,
-                            idContactInfo = idContactInfo
+                    idUser ?: usersRepository.find(
+                            idContactInfo = idContactInfo,
+                            phoneNumber = phoneNumberUser,
+                            email = emailUser
                     ).idUser,
                     number,
                     title
@@ -47,10 +47,10 @@ class SectionsServiceImpl : SectionsService {
             emailUser: String?
     ) =
             sectionsRepository.findAllByUser(
-                    idUser ?: usersRepository.get(
-                            emailUser,
-                            phoneNumberUser,
-                            idContactInfo = idContactInfo
+                    idUser ?: usersRepository.find(
+                            idContactInfo = idContactInfo,
+                            phoneNumber = phoneNumberUser,
+                            email = emailUser
                     ).idUser
             )
 
@@ -65,10 +65,10 @@ class SectionsServiceImpl : SectionsService {
             findByEmailUser: String?
     ) =
             sectionsRepository.run {
-                val foundIdUser = findByIdUser ?: usersRepository.get(
-                        findByEmailUser,
-                        findByPhoneNumberUser,
-                        idContactInfo = findByIdContactInfo
+                val foundIdUser = findByIdUser ?: usersRepository.find(
+                        idContactInfo = findByIdContactInfo,
+                        phoneNumber = findByPhoneNumberUser,
+                        email = findByEmailUser
                 ).idUser
                 when {
                     httpMethod.matches("POST") -> {
@@ -103,10 +103,10 @@ class SectionsServiceImpl : SectionsService {
             sectionsRepository.run {
                 remove(
                         idSection ?: find(
-                                idUser = idUser ?: usersRepository.get(
-                                        emailUser,
-                                        phoneNumberUser,
-                                        idContactInfo = idContactInfo
+                                idUser = idUser ?: usersRepository.find(
+                                        idContactInfo = idContactInfo,
+                                        phoneNumber = phoneNumberUser,
+                                        email = emailUser
                                 ).idUser,
                                 number = number,
                                 title = title
@@ -121,10 +121,10 @@ class SectionsServiceImpl : SectionsService {
             emailUser: String?
     ) =
             sectionsRepository.removeAllByUser(
-                    idUser ?: usersRepository.get(
-                            emailUser,
-                            phoneNumberUser,
-                            idContactInfo = idContactInfo
+                    idUser ?: usersRepository.find(
+                            idContactInfo = idContactInfo,
+                            phoneNumber = phoneNumberUser,
+                            email = emailUser
                     ).idUser
             )
 

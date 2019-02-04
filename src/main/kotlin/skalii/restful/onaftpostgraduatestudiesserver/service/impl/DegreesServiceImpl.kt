@@ -17,7 +17,7 @@ class DegreesServiceImpl : DegreesService {
     @Autowired
     private lateinit var degreesRepository: DegreesRepository
 
-    @Autowired //todo change userRepository
+    @Autowired
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
@@ -39,11 +39,11 @@ class DegreesServiceImpl : DegreesService {
                     )
                 } else {
                     find(
-                            usersRepository.get(
-                                    emailUser,
-                                    phoneNumberUser,
+                            usersRepository.find(
                                     idUser,
-                                    idContactInfo
+                                    idContactInfo,
+                                    phoneNumberUser,
+                                    emailUser
                             ).degree?.idDegree
                     )
                 }

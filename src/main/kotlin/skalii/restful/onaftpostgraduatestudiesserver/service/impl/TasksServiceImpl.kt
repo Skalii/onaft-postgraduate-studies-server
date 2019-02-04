@@ -21,7 +21,7 @@ class TasksServiceImpl : TasksService {
     @Autowired
     private lateinit var sectionsRepository: SectionsRepository
 
-    @Autowired //todo change usersRepository
+    @Autowired
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
@@ -171,9 +171,8 @@ class TasksServiceImpl : TasksService {
                                 phoneNumber = findByPhoneNumberInstructor,
                                 email = findByEmailInstructor
                         )
-                        if (usersRepository.get(
-                                        idUser = foundIdStudent
-                                ).studyInfo!!.instructor.idUser == foundIdInstructor) {
+                        if (usersRepository.find(foundIdStudent)
+                                        .studyInfo!!.instructor.idUser == foundIdInstructor) {
                             setMarkInstructor(
                                     newTask,
                                     foundIdSection,
@@ -268,11 +267,11 @@ class TasksServiceImpl : TasksService {
             phoneNumber: String? = null,
             email: String? = null
     ): Int? {
-        val foundIdUser = idUser ?: usersRepository.get(
-                email,
-                phoneNumber,
+        val foundIdUser = idUser ?: usersRepository.find(
                 idUser,
-                idContactInfo
+                idContactInfo,
+                phoneNumber,
+                email
         ).idUser
         return if (foundIdUser == 0) null else foundIdUser
     }

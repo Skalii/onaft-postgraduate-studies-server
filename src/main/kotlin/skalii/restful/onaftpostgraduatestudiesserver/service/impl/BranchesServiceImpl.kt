@@ -18,10 +18,10 @@ class BranchesServiceImpl : BranchesService {
     @Autowired
     private lateinit var branchesRepository: BranchesRepository
 
-    @Autowired //todo change specialitiesRepository
+    @Autowired
     private lateinit var specialitiesRepository: SpecialitiesRepository
 
-    @Autowired //todo change userRepository
+    @Autowired
     private lateinit var usersRepository: UsersRepository
 
     override fun get(
@@ -49,19 +49,19 @@ class BranchesServiceImpl : BranchesService {
                         || numberSpeciality != null
                         || nameSpeciality != null) {
                     find(
-                            specialitiesRepository.get(
-                                    numberSpeciality,
-                                    nameSpeciality,
-                                    idSpeciality
+                            specialitiesRepository.find(
+                                    idSpeciality,
+                                    number,
+                                    name
                             ).branch.idBranch
                     )
                 } else {
                     find(
-                            usersRepository.get(
-                                    emailUser,
-                                    phoneNumberUser,
+                            usersRepository.find(
                                     idUser,
-                                    idContactInfo
+                                    idContactInfo,
+                                    phoneNumberUser,
+                                    emailUser
                             ).speciality.branch.idBranch
                     )
                 }
@@ -113,10 +113,10 @@ class BranchesServiceImpl : BranchesService {
                     )
                 } else {
                     remove(
-                            specialitiesRepository.get(
-                                    numberSpeciality,
-                                    nameSpeciality,
-                                    idSpeciality
+                            specialitiesRepository.find(
+                                    idSpeciality,
+                                    number,
+                                    name
                             ).branch.idBranch
                     )
                 }

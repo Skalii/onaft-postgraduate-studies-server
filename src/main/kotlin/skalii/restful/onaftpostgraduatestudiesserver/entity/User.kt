@@ -1,7 +1,11 @@
 package skalii.restful.onaftpostgraduatestudiesserver.entity
 
 
-import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.fasterxml.jackson.annotation.JsonView
 
 import java.util.Date
 
@@ -25,10 +29,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.enum.*
-import skalii.restful.onaftpostgraduatestudiesserver.repository.DegreesRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.DepartmentsRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.SpecialitiesRepository
-import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
 import skalii.restful.onaftpostgraduatestudiesserver.view.View.*
 
 
@@ -39,8 +39,7 @@ import skalii.restful.onaftpostgraduatestudiesserver.view.View.*
             "full_name_ua", "full_name_en", "birthday",
             "family_status", "children", "academy_rank",
             "degree", "speciality", "department", "contact_info",
-            "scientific_links", "study_info", "students", "sections"
-        ])
+            "scientific_links", "study_info", "students", "sections"])
 @JsonIgnoreProperties(value = ["hash", "salt"])
 @SequenceGenerator(
         name = "users_seq",
@@ -307,91 +306,5 @@ data class User(
                 children=$children,
                 academicRank=${academicRank?.value}
                 )""".trimMargin()
-
-
-    fun fixInitializedAdd(
-            degreesRepository: DegreesRepository,
-            specialitiesRepository: SpecialitiesRepository,
-            departmentsRepository: DepartmentsRepository
-    ): User {
-        if (this.degree != null
-                && this.degree!!.idDegree == 0
-                && (this.degree!!.name != AcademicDegree.UNKNOWN
-                        && this.degree!!.branch != BranchOfScience.UNKNOWN)) {
-            this.degree = degreesRepository.get(
-                    this.degree!!.name.value,
-                    this.degree!!.branch.value
-            )
-        }
-        if (this.speciality.idSpeciality == 0) {
-            if (this.speciality.number != "Невiдомий код") {
-                this.speciality = specialitiesRepository.get(
-                        this.speciality.number
-                )
-            } else if (this.speciality.name != "Невідома спеціальність") {
-                this.speciality = specialitiesRepository.get(
-                        name = this.speciality.name
-                )
-            }
-        }
-        if (this.department.idDepartment == 0
-                && this.department.name != "Невідома кафедра") {
-            this.department = departmentsRepository.get(this.department.name)
-        }
-        return this
-    }
-
-    fun fixInitializedSet(
-            usersRepository: UsersRepository,
-            degreesRepository: DegreesRepository,
-            specialitiesRepository: SpecialitiesRepository,
-            departmentsRepository: DepartmentsRepository,
-            email: String? = null,
-            phoneNumber: String? = null
-    ): User {
-        var foundUser: User? = null
-        if (!this::contactInfo.isInitialized) {
-            foundUser = usersRepository.get(
-                    try {
-                        this.contactInfo.email
-                    } catch (e: Exception) {
-                        email
-                    },
-                    try {
-                        this.contactInfo.phoneNumber
-                    } catch (e: Exception) {
-                        phoneNumber
-                    }
-            )
-            this.contactInfo = foundUser.contactInfo
-        }
-        if (!this::speciality.isInitialized) {
-            this.speciality = foundUser?.speciality
-                    ?: usersRepository.get(
-                    this.contactInfo.email,
-                    this.contactInfo.phoneNumber
-            ).speciality
-        }
-        if (!this::department.isInitialized) {
-            this.department = foundUser?.department
-                    ?: usersRepository.get(
-                    this.contactInfo.email,
-                    this.contactInfo.phoneNumber
-            ).department
-        }
-        if (this.degree?.idDegree == null) {
-            this.degree = foundUser?.degree
-                    ?: usersRepository.get(
-                    this.contactInfo.email,
-                    this.contactInfo.phoneNumber
-            ).degree
-        }
-        fixInitializedAdd(
-                degreesRepository,
-                specialitiesRepository,
-                departmentsRepository
-        )
-        return this
-    }
 
 }
