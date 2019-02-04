@@ -55,7 +55,7 @@ interface InstitutesRepository : EmptyRepository<Institute, Int> {
                           cast_text(:#{#institute.namedAfter}),
                           cast_text(:#{#institute.abbreviation}),
                           cast_int(:#{#institute.idInstitute}),
-                          cast_text(:name)
+                          cast_text(:old_name)
                       )).*""",
             nativeQuery = true)
     fun set(

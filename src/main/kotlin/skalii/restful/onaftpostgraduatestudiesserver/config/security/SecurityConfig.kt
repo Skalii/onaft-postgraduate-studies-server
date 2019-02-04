@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 //import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository
 
 import skalii.restful.onaftpostgraduatestudiesserver.entity.enum.UserRole.*
-import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
+import skalii.restful.onaftpostgraduatestudiesserver.service.UsersService
 
 
 @Configuration
@@ -29,7 +29,7 @@ import skalii.restful.onaftpostgraduatestudiesserver.repository.UsersRepository
 class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
-    lateinit var usersRepository: UsersRepository
+    lateinit var usersService: UsersService
 
     override fun configure(http: HttpSecurity?) {
         http!!
@@ -163,11 +163,11 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Autowired
     @Throws(Exception::class)
     fun configureGlobal(auth: AuthenticationManagerBuilder) {
-        usersRepository.getAll(true).forEach { user ->
+        usersService.getAll(true).forEach { user ->
             auth
                     .inMemoryAuthentication()
                     .withUser(user.contactInfo.email)
-                    .password(passwordEncoder().encode(usersRepository.decrypt(user.idUser)))
+                    .password(passwordEncoder().encode(usersService.decryptPassword(user.idUser)))
                     .roles(user.role.value)
         }
     }
