@@ -11,10 +11,22 @@ enum class BranchOfScience(@get:JsonValue val value: String) {
 
     EMPTY(""),
     UNKNOWN("Невідома галузь науки"),
-    ECONOMIC("економічних наук"),
+    PHYSICAL_MATHEMATICAL("фізико-математичних наук"),
     TECHNICAL("технічних наук"),
     CHEMICAL("хімічних наук"),
-    PHYSICAL_MATHEMATICAL("фізико-математичних наук");
+    BIOLOGICAL("біологічних наук"),
+    MEDICAL("медичних наук"),
+    AGRICULTURAL("сільськогосподарських наук"),
+    VETERINARY("ветеринарних наук"),
+    GEOLOGICAL("геологічних наук"),
+    ECONOMICAL("економічних наук"),
+    PSYCHOLOGICAL("психологічних наук"),
+    HISTORICAL("історичних наук"),
+    PHILOLOGICAL("філологічних наук"),
+    PEDAGOGICAL("педагогічних наук"),
+    PHILOSOPHICAL("філософських наук"),
+    SOCIOLOGICAL("соціологічних наук"),
+    JURIDICAL("юридичних наук");
 
     companion object {
 

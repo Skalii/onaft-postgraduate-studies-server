@@ -11,7 +11,7 @@ enum class UserRole(@get:JsonValue val value: String) {
 
     EMPTY(""),
     UNKNOWN("Невідомий користувач"),
-    ADMIN("Аспірантура"),
+    ADMIN("Адміністратор"),
     GRADUATE_STUDENT("Аспірант"),
     DOCTORAL_STUDENT("Докторант"),
     INSTRUCTOR("Керівник");

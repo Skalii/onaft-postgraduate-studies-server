@@ -12,8 +12,7 @@ enum class AcademicDegree(@get:JsonValue val value: String) {
     EMPTY(""),
     UNKNOWN("Невідомий вчений ступінь"),
     CANDIDATE("Кандидат"),
-    DOCTOR("Доктор"),
-    PHD("PhD");
+    DOCTOR("Доктор");
 
     companion object {
 
